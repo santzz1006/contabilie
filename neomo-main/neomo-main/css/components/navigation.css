@@ -1,0 +1,58 @@
+/* Navigation Information */
+
+/*
+* Title : nav
+* Description : this is navigation.
+*/
+.nav {
+  display: flex;
+  padding-left: 0;
+  list-style: none;
+}
+
+.nav-column {
+  display: flex;
+  flex-direction: column;
+  padding-left: 0;
+  list-style: none;
+}
+
+.nav .disabled,
+.nav-column .disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.nav-item {
+  display: list-item;
+}
+
+.nav-link {
+  display: block;
+  text-decoration: none;
+  padding: 0.7rem 2rem;
+  border-radius: 1rem;
+  color: #707070;
+}
+
+.nav-link:hover {
+  box-shadow: inset 3px 3px 5px #c0c0c0, inset -3px -3px 5px #fff !important;
+}
+
+/*
+  * Title : nav-link--animation
+  * Description : 
+*/
+
+.nav-link--animation {
+  display: block;
+  text-decoration: none;
+  padding: 0.7rem 2rem;
+  border-radius: 1rem;
+  color: #707070;
+  transition: box-shadow 0.5s ease-in-out;
+}
+
+.nav-link--animation:hover {
+  box-shadow: inset 3px 3px 5px #c0c0c0, inset -3px -3px 5px #fff !important;
+}

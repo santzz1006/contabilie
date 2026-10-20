@@ -1,0 +1,343 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #FAF8F5;
+  --surf: #FFFFFF;
+  --surf2: #F5F1EC;
+  --line: #EEE9E3;
+  --tx: #1B1917;
+  --tx2: #78716C;
+  --or: #F97316;
+  --or-h: #EA6A0C;
+  --or-s: #FFEDD9;
+  --dk: #1C1917;
+  --dk-tx: #FFFFFF;
+  --ink: #2A2622;
+  --ok: #F97316;
+  --warn: #D97706;
+  --err: #DC2626;
+  --glass: rgba(255, 255, 255, 0.68);
+  --glass-line: rgba(255, 255, 255, 0.9);
+  --neo-l: #FFFFFF;
+  --neo-d: rgba(120, 100, 80, 0.16);
+  --blob: rgba(249, 115, 22, 0.16);
+  --shadow: 0 1px 2px rgba(60, 40, 20, 0.05);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #262624;
+  --surf: #30302E;
+  --surf2: #3A3936;
+  --line: #43413D;
+  --tx: #F5F4EE;
+  --tx2: #A8A29A;
+  --or: #FF8A4C;
+  --or-h: #FF9A64;
+  --or-s: rgba(255, 138, 76, 0.14);
+  --dk: #F5F4EE;
+  --dk-tx: #262624;
+  --ink: #5A564F;
+  --ok: #FF8A4C;
+  --warn: #FBBF24;
+  --err: #F87171;
+  --glass: rgba(48, 48, 46, 0.62);
+  --glass-line: rgba(255, 255, 255, 0.08);
+  --neo-l: rgba(255, 255, 255, 0.04);
+  --neo-d: rgba(0, 0, 0, 0.35);
+  --blob: rgba(255, 138, 76, 0.13);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  color-scheme: dark;
+}
+
+@font-face {
+  font-family: 'Alpino';
+  src: url('/fonts/Alpino-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Alpino';
+  src: url('/fonts/Alpino-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Alpino';
+  src: url('/fonts/Alpino-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--bg);
+  color: var(--tx);
+  font-family: 'Alpino', 'Inter', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  overflow-x: clip;
+  position: relative;
+}
+
+/* Mancha Laranja Estática de Fundo */
+body::before {
+  content: "";
+  position: fixed;
+  width: 520px;
+  height: 520px;
+  right: -120px;
+  top: -160px;
+  border-radius: 50%;
+  background: var(--blob);
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Glassmorphism Oficial */
+.contabilis-glass {
+  background: var(--glass);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid var(--glass-line);
+}
+
+/* Cartões com Superfície Sólida */
+.contabilis-card {
+  background: var(--surf);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+/* Neumorfismo Suave nos Ícones */
+.contabilis-neo {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  color: var(--tx2);
+  background: var(--surf);
+  box-shadow: 3px 3px 8px var(--neo-d), -3px -3px 8px var(--neo-l);
+}
+
+/* Cartão Destaque Laranja */
+.hot-orange {
+  background: var(--or) !important;
+  border-color: var(--or) !important;
+  color: #ffffff !important;
+}
+.hot-orange .ct,
+.hot-orange .sub {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+.hot-orange .contabilis-neo {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="dark"] .hot-orange {
+  color: #2A1608 !important;
+}
+:root[data-theme="dark"] .hot-orange .ct,
+:root[data-theme="dark"] .hot-orange .sub {
+  color: rgba(42, 22, 8, 0.85) !important;
+}
+:root[data-theme="dark"] .hot-orange .contabilis-neo {
+  background: rgba(42, 22, 8, 0.15) !important;
+  color: #2A1608 !important;
+}
+
+/* Trilho Neumórfico da Barra de Progresso */
+.contabilis-track {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--surf2);
+  box-shadow: inset 2px 2px 4px var(--neo-d), inset -2px -2px 4px var(--neo-l);
+  overflow: hidden;
+}
+
+.contabilis-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--or);
+  transition: width 0.5s ease;
+}
+
+/* Mesma sensação de superfície do painel nos controles das páginas dos módulos. */
+.dashboard-page-content input:not([type="checkbox"]):not([type="radio"]),
+.dashboard-page-content select,
+.dashboard-page-content textarea {
+  border-color: var(--line) !important;
+  border-radius: 10px;
+  background-color: var(--surf) !important;
+  color: var(--tx) !important;
+  box-shadow: inset 2px 2px 5px var(--neo-d), inset -2px -2px 5px var(--neo-l);
+}
+
+.dashboard-page-content input:not([type="checkbox"]):not([type="radio"]):focus,
+.dashboard-page-content select:focus,
+.dashboard-page-content textarea:focus {
+  border-color: var(--or) !important;
+  box-shadow: inset 2px 2px 5px var(--neo-d), inset -2px -2px 5px var(--neo-l), 0 0 0 3px var(--or-s);
+}
+
+.dashboard-page-content button[class*="border-"]:not(:disabled) {
+  box-shadow: 2px 2px 6px var(--neo-d), -2px -2px 6px var(--neo-l);
+}
+
+.dashboard-page-content button[class*="border-"]:not(:disabled):active {
+  box-shadow: inset 2px 2px 5px var(--neo-d), inset -2px -2px 5px var(--neo-l);
+}
+
+/* Foco Visível Acessível */
+:focus-visible {
+  outline: 2px solid var(--or);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Redução de Movimento */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Keep every application surface aligned with the Contabilis theme. */
+.contabilis-app-content [class~="bg-white"] {
+  background-color: var(--surf) !important;
+}
+.contabilis-app-content [class~="bg-slate-50"],
+.contabilis-app-content [class~="bg-slate-100"],
+.contabilis-app-content [class~="bg-slate-200"],
+.contabilis-app-content [class~="bg-slate-50/50"],
+.contabilis-app-content [class~="bg-slate-50/70"],
+.contabilis-app-content [class~="bg-slate-100/50"],
+.contabilis-app-content [class~="bg-slate-100/70"] {
+  background-color: var(--surf2) !important;
+}
+.contabilis-app-content [class~="bg-slate-700"],
+.contabilis-app-content [class~="bg-slate-800"] {
+  background-color: var(--dk) !important;
+}
+.contabilis-app-content [class~="bg-slate-700"][class~="text-white"],
+.contabilis-app-content [class~="bg-slate-800"][class~="text-white"] {
+  color: var(--dk-tx) !important;
+}
+.contabilis-app-content [class~="bg-slate-900/40"] {
+  background-color: color-mix(in srgb, var(--dk) 42%, transparent) !important;
+}
+.contabilis-app-content [class~="text-slate-900"],
+.contabilis-app-content [class~="text-slate-800"],
+.contabilis-app-content [class~="text-slate-950"] {
+  color: var(--tx) !important;
+}
+.contabilis-app-content [class~="text-slate-700"],
+.contabilis-app-content [class~="text-slate-600"],
+.contabilis-app-content [class~="text-slate-500"] {
+  color: var(--tx2) !important;
+}
+.contabilis-app-content [class~="text-slate-400"] {
+  color: color-mix(in srgb, var(--tx) 68%, var(--tx2)) !important;
+}
+.contabilis-app-content [class~="border-slate-100"],
+.contabilis-app-content [class~="border-slate-200"],
+.contabilis-app-content [class~="border-slate-300"],
+.contabilis-app-content [class~="border-slate-700"],
+.contabilis-app-content [class~="divide-slate-100"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--line) !important;
+}
+.contabilis-app-content [class~="bg-emerald-600"] {
+  background-color: var(--dk) !important;
+}
+.contabilis-app-content [class~="bg-emerald-600"][class~="text-white"] {
+  color: var(--dk-tx) !important;
+}
+.contabilis-app-content [class~="bg-emerald-50"],
+.contabilis-app-content [class~="bg-emerald-50/50"],
+.contabilis-app-content [class~="bg-emerald-50/60"],
+.contabilis-app-content [class~="bg-emerald-100"] {
+  background-color: var(--or-s) !important;
+}
+.contabilis-app-content [class~="bg-emerald-500"] {
+  background-color: var(--or) !important;
+}
+.contabilis-app-content [class~="bg-emerald-700"],
+.contabilis-app-content [class~="bg-emerald-800"] {
+  background-color: var(--dk) !important;
+  color: var(--dk-tx) !important;
+}
+.contabilis-app-content [class~="bg-amber-50"],
+.contabilis-app-content [class~="bg-amber-50/50"],
+.contabilis-app-content [class~="bg-amber-100"],
+.contabilis-app-content [class~="bg-sky-50"] {
+  background-color: var(--or-s) !important;
+}
+.contabilis-app-content [class~="text-amber-700"],
+.contabilis-app-content [class~="text-amber-800"],
+.contabilis-app-content [class~="text-amber-900"],
+.contabilis-app-content [class~="text-sky-700"] {
+  color: var(--tx) !important;
+}
+.contabilis-app-content [class~="text-amber-600"],
+.contabilis-app-content [class~="text-sky-600"] {
+  color: var(--or) !important;
+}
+.contabilis-app-content [class*="border-amber-"],
+.contabilis-app-content [class*="border-sky-"] {
+  border-color: var(--line) !important;
+}
+.contabilis-app-content [class*="text-emerald-"] {
+  color: var(--tx) !important;
+}
+.contabilis-app-content [class~="text-emerald-600"],
+.contabilis-app-content [class~="hover:text-emerald-600"]:hover,
+.contabilis-app-content [class~="hover:text-emerald-700"]:hover {
+  color: var(--or) !important;
+}
+.contabilis-app-content [class*="border-emerald-"] {
+  border-color: var(--line) !important;
+}
+.contabilis-app-content [class*="ring-emerald-"] {
+  --tw-ring-color: var(--or) !important;
+}
+.contabilis-app-content [class*="accent-emerald-"] {
+  accent-color: var(--or) !important;
+}
+.contabilis-app-content [class~="hover:bg-slate-50"]:hover,
+.contabilis-app-content [class~="hover:bg-slate-50/50"]:hover,
+.contabilis-app-content [class~="hover:bg-slate-100"]:hover {
+  background-color: var(--surf2) !important;
+}
+.contabilis-app-content [class~="hover:bg-emerald-100"]:hover {
+  background-color: var(--or-s) !important;
+}
+.contabilis-app-content [class~="hover:text-slate-900"]:hover {
+  color: var(--tx) !important;
+}
+.contabilis-app-content [class~="hover:bg-emerald-700"]:hover {
+  background-color: var(--dk) !important;
+  opacity: 0.9;
+}
+.contabilis-app-content [class~="active:bg-emerald-800"]:active {
+  background-color: var(--dk) !important;
+  transform: scale(0.98);
+}

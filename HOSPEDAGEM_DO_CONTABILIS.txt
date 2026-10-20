@@ -1,0 +1,34 @@
+﻿COMO HOSPEDAR O CONTABILIS
+
+RESUMO
+O Contabilis deste projeto é uma aplicação Next.js com páginas e API no servidor. Para publicar todas as funções atuais, hospede como aplicação Next.js/Node. Você não precisa instalar Node no computador para que o site publicado funcione: a plataforma executa o servidor para você.
+
+OPÇÃO MAIS SIMPLES: VERCEL
+1. Envie o projeto para um repositório GitHub privado (recomendado para o código do SaaS).
+2. Entre em https://vercel.com/ e conecte sua conta GitHub.
+3. Escolha Add New > Project e importe o repositório do Contabilis.
+4. Mantenha o framework Next.js detectado automaticamente e as configurações padrão de build.
+5. Clique em Deploy. A Vercel fará o build e fornecerá um endereço público.
+6. Para atualizações futuras, envie as alterações ao GitHub; a Vercel fará novos deploys.
+7. Configure um banco de dados persistente antes de usar com dados reais.
+
+ALTERNATIVA: RENDER
+1. Envie o projeto ao GitHub e conecte a conta em https://render.com/.
+2. Crie um serviço Web Service e selecione o repositório.
+3. Configure Runtime como Node, Build Command como `npm install && npm run build` e Start Command como `npm run start`.
+4. Publique e use o endereço onrender.com. Serviços gratuitos podem ficar suspensos após um período sem acesso e levar mais tempo para abrir na primeira visita.
+5. Configure um banco de dados persistente antes de usar com dados reais.
+
+POSSO USAR O GITHUB PAGES E NÃO USAR NODE?
+O GitHub Pages hospeda arquivos estáticos (HTML, CSS e JavaScript). Ele não executa o servidor Next.js nem as APIs deste projeto. Hoje, telas fazem chamadas a `/api/...`, e a aplicação grava dados em `data/store.json`. Por isso, publicar o projeto atual diretamente no Pages não mantém o SaaS funcionando: clientes, tarefas, documentos, conciliação e outras funções dependem das APIs.
+
+É possível usar GitHub Pages sem Node em tempo de execução se transformar o projeto em uma exportação estática e mover todas as APIs e o armazenamento para um serviço externo (por exemplo, um backend hospedado e banco de dados). Essa adaptação exige alterações no código e configuração de autenticação, CORS e variáveis de ambiente. O build ainda pode usar Node no GitHub Actions ou na máquina que gera os arquivos, mesmo que o site estático publicado não precise de servidor Node.
+
+IMPORTANTE SOBRE OS DADOS
+O arquivo `data/store.json` serve para demonstração/local. Em hospedagens comuns, o disco do servidor pode ser temporário ou não compartilhar dados entre instâncias. Antes de usar o sistema com dados reais, substitua esse armazenamento por um banco persistente e configure backups, autenticação e variáveis de ambiente. Não publique dados de clientes ou credenciais no repositório.
+
+DOCUMENTAÇÃO OFICIAL
+GitHub Pages (hospedagem estática): https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages
+Exportação estática do Next.js e recursos não suportados, como APIs: https://nextjs.org/docs/app/guides/static-exports
+Deploy Next.js na Vercel: https://vercel.com/docs/frameworks/full-stack/nextjs
+Deploy Next.js no Render: https://render.com/docs/deploy-nextjs-app

@@ -1,0 +1,69 @@
+/* Icon Information */
+
+/*
+* Title : icon
+* Description : icon is a container for any type of icon font
+*/
+
+.icon {
+  padding: 0.3rem;
+  font-size: 30px;
+  display: inline-flex;
+  border-radius: 10%;
+  box-shadow: 3px 3px 7px #ababab, -3px -3px 7px #ffffff;
+}
+
+.icon-sm {
+  padding: 0.25rem;
+  font-size: 15px;
+  display: inline-flex;
+  border-radius: 10%;
+  box-shadow: 3px 3px 7px #ababab, -3px -3px 7px #ffffff;
+}
+
+.icon-lg {
+  padding: 0.5rem;
+  font-size: 45px;
+  display: inline-flex;
+  border-radius: 10%;
+  box-shadow: 3px 3px 7px #ababab, -3px -3px 7px #ffffff;
+}
+
+/* icon FINISH */
+
+/*
+* Title : icon-circle
+* Description : Icon circle shape
+*/
+
+.icon-circle {
+  padding: 0.5rem;
+  font-size: 30px;
+  display: inline-flex;
+  border-radius: 100%;
+  box-shadow: 3px 3px 7px #ababab, -3px -3px 7px #ffffff;
+}
+
+.icon-circle--sm {
+  width: 25px;
+  height: 25px;
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100%;
+  box-shadow: 3px 3px 7px #ababab, -3px -3px 7px #ffffff;
+}
+
+.icon-circle--lg {
+  width: 65px;
+  height: 65px;
+  font-size: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100%;
+  box-shadow: 3px 3px 7px #ababab, -3px -3px 7px #ffffff;
+}
+
+/* icon-circle FINISH */

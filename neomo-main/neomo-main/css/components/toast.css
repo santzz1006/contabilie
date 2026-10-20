@@ -1,0 +1,53 @@
+/* Toast Section Information */
+
+/*
+* Title : Toast component
+* Description : this is Toast
+*/
+
+.toast {
+  max-width: 350px;
+  padding: 1rem 1.3rem;
+  overflow: hidden;
+  background-clip: padding-box;
+  opacity: 0;
+  border-radius: 10px;
+  box-shadow: 3px 3px 7px #ababab, -3px -3px 7px #ffffff;
+}
+
+.toast.show {
+  display: block;
+  opacity: 1;
+}
+
+.toast-header {
+  display: flex;
+  align-items: center;
+  padding: 0.4rem 0.6rem;
+  background-clip: padding-box;
+  border-bottom: 1px solid;
+  border-color: var(--neomo-gray);
+}
+
+.toast-body {
+  font-size: 1rem;
+  padding: 1rem 0.75rem 0.25rem 0.75rem;
+}
+
+.toast-close {
+  float: right;
+  border: none;
+  color: #b8b9be;
+  font-weight: bold;
+  background-color: transparent;
+}
+
+.toast-close:hover,
+.toast-close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+  outline: 0;
+}
+
+/* Toast component FINISH */

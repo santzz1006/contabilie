@@ -1,0 +1,6 @@
+﻿Para iniciar o servidor do SaaS pelo CMD:
+
+cd /d "C:\Users\neila\OneDrive\Desktop\soft"
+npm run dev
+
+Depois acesse: http://localhost:3000
