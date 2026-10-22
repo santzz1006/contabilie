@@ -2,6 +2,7 @@
 
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { verifyMockAccount } from "@/lib/mock-accounts";
 import { Eye, EyeOff, Moon, Sun } from "lucide-react";
 import gsap from "gsap";
 import "./login.css";
@@ -254,6 +255,7 @@ export default function LoginPage() {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"error" | "success" | "">("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -326,7 +328,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isLoading) return;
+    if (isLoading || isDemoLoading) return;
     emailRef.current?.removeAttribute("aria-invalid");
     passwordRef.current?.removeAttribute("aria-invalid");
     setMessage("");
@@ -344,6 +346,15 @@ export default function LoginPage() {
     setMood("mouse");
     setIsLoading(true);
     try {
+      if (await verifyMockAccount(email, password)) {
+        const demo = await fetch("/api/auth/demo", { method: "POST" });
+        const demoResult = await demo.json();
+        if (!demo.ok) throw new Error(demoResult.error || "Não foi possível abrir o painel de demonstração.");
+        setIsConfirmed(true);
+        setMood("happy");
+        window.location.assign("/painel");
+        return;
+      }
       const response = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim(), password, remember: keepConnected }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Não foi possível entrar.");
@@ -357,6 +368,25 @@ export default function LoginPage() {
       setMood("error");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const enterDemo = async () => {
+    if (isLoading || isDemoLoading) return;
+    setIsDemoLoading(true);
+    setMessage("");
+    setMessageType("");
+    try {
+      const response = await fetch("/api/auth/demo", { method: "POST" });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Não foi possível abrir a demonstração.");
+      setIsConfirmed(true);
+      window.location.assign("/painel");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Não foi possível abrir a demonstração.");
+      setMessageType("error");
+    } finally {
+      setIsDemoLoading(false);
     }
   };
 
@@ -451,7 +481,7 @@ export default function LoginPage() {
               </div>
 
               <p className={`login-message ${messageType}`} role="alert" aria-live="polite">{message}</p>
-              <button className="login-submit login-fx" type="submit" disabled={isLoading}>
+              <button className="login-submit login-fx" type="submit" disabled={isLoading || isDemoLoading}>
                 {isLoading && <span className="login-spinner" aria-hidden="true" />}
                 <span>{isLoading ? "Entrando" : isConfirmed ? "Acesso confirmado" : "Entrar"}</span>
               </button>
@@ -459,6 +489,10 @@ export default function LoginPage() {
 
             <div className="login-divider login-fx">Primeiro acesso?</div>
             <Link className="login-submit login-google login-fx" href="/criar-conta">Criar conta do escritório</Link>
+            <button className="login-demo-submit login-fx" type="button" onClick={enterDemo} disabled={isLoading || isDemoLoading}>
+              {isDemoLoading && <span className="login-spinner" aria-hidden="true" />}
+              {isDemoLoading ? "Abrindo demonstração..." : "Entrar sem conta · ver demonstração"}
+            </button>
           </section>
         </article>
 

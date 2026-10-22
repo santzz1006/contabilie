@@ -41,8 +41,44 @@ const DB_FILE_PATH = process.env.CONTABILIS_DB_PATH || path.join(process.cwd(), 
 const seedData = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'src', 'lib', 'seed-data.json'), 'utf-8'));
 const INITIAL_DATA = { ...seedData, passwordResets: [] } as unknown as DatabaseSchema;
 
+export interface DataRepository {
+  getTenant(id: string): Organization | undefined;
+  getAllTenants(): Organization[];
+  getUsers(tenantId: string): User[];
+  getUserById(id: string): User | undefined;
+  getUserByEmail(email: string): User | undefined;
+  saveUser(user: User): void;
+  addPasswordReset(record: PasswordResetRecord): void;
+  getPasswordReset(tokenHash: string): PasswordResetRecord | undefined;
+  consumePasswordReset(tokenHash: string): void;
+  createAccount(organization: Organization, user: User): void;
+  getClients(tenantId: string): Client[];
+  getClientById(tenantId: string, clientId: string): Client | undefined;
+  saveClient(client: Client): Client;
+  getDocumentRequests(tenantId: string, clientId?: string): DocumentRequest[];
+  saveDocumentRequest(request: DocumentRequest): DocumentRequest;
+  getDocuments(tenantId: string, clientId?: string): DocumentItem[];
+  saveDocument(document: DocumentItem): DocumentItem;
+  getBankTransactions(tenantId: string, clientId?: string): BankTransaction[];
+  saveBankTransaction(transaction: BankTransaction): BankTransaction;
+  saveBankTransactionsBulk(transactions: BankTransaction[]): void;
+  getAccountCategories(tenantId: string): AccountCategory[];
+  getCertificates(tenantId: string, clientId?: string): Certificate[];
+  saveCertificate(certificate: Certificate): Certificate;
+  getTaxSimulations(tenantId: string): TaxSimulation[];
+  saveTaxSimulation(simulation: TaxSimulation): TaxSimulation;
+  getTasks(tenantId: string, clientId?: string): TaskItem[];
+  saveTask(task: TaskItem): TaskItem;
+  getWebsite(tenantId: string): WebsiteConfig | undefined;
+  saveWebsite(website: WebsiteConfig): WebsiteConfig;
+  getAuditEvents(tenantId: string): AuditEvent[];
+  logAuditEvent(event: AuditEvent): void;
+  getNotifications(tenantId: string): NotificationItem[];
+  saveNotification(notification: NotificationItem): void;
+}
+
 // Database class managing atomic persistence and multi-tenant scoping
-class DatabaseStore {
+class DatabaseStore implements DataRepository {
   private data: DatabaseSchema;
 
   constructor() {
@@ -95,6 +131,7 @@ class DatabaseStore {
       }
     } catch (error) {
       console.error('Erro ao persistir banco de dados:', error);
+      throw new Error('Não foi possível salvar os dados locais. Verifique a permissão de gravação ou configure um banco persistente para este ambiente.');
     }
   }
 
@@ -144,9 +181,16 @@ class DatabaseStore {
   }
 
   createAccount(organization: Organization, user: User): void {
+    if (this.getUserByEmail(user.email)) throw new Error('Este e-mail já possui uma conta. Entre ou use outro endereço.');
     this.data.organizations.push(organization);
     this.data.users.push(user);
-    this.persist();
+    try {
+      this.persist();
+    } catch (error) {
+      this.data.organizations.pop();
+      this.data.users.pop();
+      throw error;
+    }
   }
 
   getClients(tenantId: string): Client[] {
@@ -321,4 +365,4 @@ class DatabaseStore {
   }
 }
 
-export const db = new DatabaseStore();
+export const db: DataRepository = new DatabaseStore();
