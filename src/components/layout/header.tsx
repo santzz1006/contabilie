@@ -6,14 +6,11 @@ import {
   Search,
   Bell,
   HelpCircle,
-  Sun,
-  Moon,
   CheckCircle2,
   Settings,
   LogOut,
   UserCheck
 } from "lucide-react";
-import { useTheme } from "@/lib/theme";
 import gsap from "gsap";
 
 interface HeaderProps {
@@ -29,7 +26,6 @@ export function Header({
   activeTab,
   onSelectTab,
 }: HeaderProps) {
-  const { theme, toggleTheme } = useTheme();
   const [openPopover, setOpenPopover] = useState<"bell" | "user" | null>(null);
   const [profile, setProfile] = useState({ name: "Conta", email: "", organization: "" });
 
@@ -199,20 +195,6 @@ export function Header({
           )}
         </div>
 
-        {/* Alternador de Tema */}
-        <button
-          onClick={toggleTheme}
-          className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors cursor-pointer"
-          style={{ color: "var(--tx2)" }}
-          aria-label="Alternar tema"
-        >
-          {theme === "dark" ? (
-            <Sun className="h-4 w-4 stroke-[1.75]" />
-          ) : (
-            <Moon className="h-4 w-4 stroke-[1.75]" />
-          )}
-        </button>
-
         {/* Menu do Usuário */}
         <div className="relative">
           <button
@@ -254,13 +236,6 @@ export function Header({
                 <Settings className="h-3.5 w-3.5" style={{ color: "var(--tx2)" }} />
                 <span>Configurações</span>
               </a>
-              <button
-                onClick={toggleTheme}
-                className="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-slate-100 transition-colors text-left cursor-pointer"
-              >
-                {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-                <span>Alternar tema</span>
-              </button>
               <div className="h-px my-1" style={{ backgroundColor: "var(--line)" }} />
               <button
                 onClick={async () => { setOpenPopover(null); await fetch("/api/auth/logout", { method: "POST" }); window.location.assign("/"); }}

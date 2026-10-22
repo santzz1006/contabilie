@@ -1,32 +1,16 @@
-﻿"use client";
+"use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { Building2, Check, Eye, EyeOff, Moon, ShieldCheck, Sun, UsersRound } from "lucide-react";
+import { Building2, Check, Eye, EyeOff, ShieldCheck, UsersRound } from "lucide-react";
 import { saveMockAccount } from "@/lib/mock-accounts";
 import "../login/login.css";
-
-type Theme = "light" | "dark";
 
 export default function CreateAccountPage() {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [theme, setTheme] = useState<Theme>("light");
-
-  useEffect(() => {
-    const current = document.documentElement.dataset.theme;
-    if (current === "dark" || current === "light") setTheme(current);
-  }, []);
-
-  function toggleTheme() {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    document.documentElement.dataset.theme = next;
-    try { localStorage.setItem("theme", next); } catch {}
-  }
-
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy) return;
@@ -66,9 +50,6 @@ export default function CreateAccountPage() {
 
   return (
     <main className="login-page signup-page">
-      <button className="login-theme signup-theme" type="button" onClick={toggleTheme} aria-label="Alternar tema" title="Alternar tema">
-        {theme === "dark" ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
-      </button>
       <div className="login-wrap signup-wrap">
         <article className="login-card signup-card">
           <section className="login-stage signup-stage" aria-label="Benefícios do Contabilis">

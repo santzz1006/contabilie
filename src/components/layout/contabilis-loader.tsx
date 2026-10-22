@@ -18,7 +18,7 @@ export function ContabilisLoader({ onComplete }: ContabilisLoaderProps) {
     fallbackTimer.current = window.setTimeout(() => {
       setVisible(false);
       onComplete?.();
-    }, 8000);
+    }, 10000);
     return () => {
       if (finishTimer.current !== null) window.clearTimeout(finishTimer.current);
       if (fallbackTimer.current !== null) window.clearTimeout(fallbackTimer.current);
@@ -31,7 +31,7 @@ export function ContabilisLoader({ onComplete }: ContabilisLoaderProps) {
     finishTimer.current = window.setTimeout(() => {
       setVisible(false);
       onComplete?.();
-    }, reducedMotion ? 900 : 3400);
+    }, reducedMotion ? 1400 : 7000);
   };
 
   if (!visible) return null;

@@ -3,11 +3,10 @@
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { verifyMockAccount } from "@/lib/mock-accounts";
-import { Eye, EyeOff, Moon, Sun } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import gsap from "gsap";
 import "./login.css";
 
-type Theme = "light" | "dark";
 type Mood = "mouse" | "email" | "away" | "peek" | "error" | "happy";
 
 function CharacterFace({
@@ -246,7 +245,6 @@ function LoginCharacters({
 
 export default function LoginPage() {
   const pageRef = useRef<HTMLElement>(null);
-  const [theme, setTheme] = useState<Theme>("light");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -280,32 +278,9 @@ export default function LoginPage() {
     };
   }, []);
 
-  useEffect(() => {
-    let initial: Theme = "light";
-    try {
-      const saved = localStorage.getItem("theme");
-      if (saved === "dark" || saved === "light") initial = saved;
-      else if (window.matchMedia("(prefers-color-scheme: dark)").matches) initial = "dark";
-    } catch {
-      initial = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    }
-    setTheme(initial);
-    document.documentElement.dataset.theme = initial;
-    return () => {
-      if (submitTimer.current) clearTimeout(submitTimer.current);
-    };
+  useEffect(() => () => {
+    if (submitTimer.current) clearTimeout(submitTimer.current);
   }, []);
-
-  const changeTheme = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    document.documentElement.dataset.theme = next;
-    try {
-      localStorage.setItem("theme", next);
-    } catch {
-      // A preferência continua ativa nesta página mesmo sem armazenamento local.
-    }
-  };
 
   const clearError = () => {
     if (messageType === "error") {
@@ -408,10 +383,6 @@ export default function LoginPage() {
 
   return (
     <main ref={pageRef} className="login-page">
-      <button className="login-theme" id="theme" onClick={changeTheme} aria-label="Alternar tema" title="Alternar tema">
-        {theme === "dark" ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
-      </button>
-
       <div className="login-wrap">
         <article className="login-card" id="login-card">
           <section className="login-stage" aria-label="Ilustração contábil interativa">

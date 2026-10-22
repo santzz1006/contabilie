@@ -14,13 +14,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
+    <html lang="pt-BR" data-theme="dark" suppressHydrationWarning>
       <head>
         <Script id="theme-init" strategy="beforeInteractive">
-          {`try { const saved = localStorage.getItem('theme'); const theme = saved === 'light' || saved === 'dark' ? saved : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); document.documentElement.dataset.theme = theme; } catch { document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }`}
+          {`document.documentElement.dataset.theme = 'dark'; try { localStorage.setItem('theme', 'dark'); } catch {}`}
         </Script>
       </head>
-      <body className="min-h-screen bg-slate-50 text-slate-900 antialiased font-sans">
+      <body className="min-h-screen antialiased font-sans">
         <div className="contabilis-app-content min-h-screen"><MobileUnavailableGate>{children}</MobileUnavailableGate></div>
       </body>
     </html>

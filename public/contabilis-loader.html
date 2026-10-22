@@ -1,15 +1,13 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<script>try{document.documentElement.dataset.theme=localStorage.getItem("theme")|| (matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}catch{document.documentElement.dataset.theme=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}</script>
+<script>document.documentElement.dataset.theme="dark"</script>
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Contabilis · Carregando</title>
 <style>
 :root{--bg:#262523;--stage:#3a3936;--card:#30302e;--floor:#2f2e2c;--ink:#f5f4ee;--muted:#a9a69e;--track:#454340;color-scheme:dark}
-@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f3efe6;--stage:#ece7dc;--card:#fffdf9;--floor:#e0dacd;--ink:#1c1917;--muted:#6f6a5f;--track:#e6e0d3;color-scheme:light}}
-:root[data-theme="light"]{--bg:#f3efe6;--stage:#ece7dc;--card:#fffdf9;--floor:#e0dacd;--ink:#1c1917;--muted:#6f6a5f;--track:#e6e0d3;color-scheme:light}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{background:var(--bg);font-family:"Plus Jakarta Sans",ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink)}
@@ -73,7 +71,6 @@ body{background:var(--bg);font-family:"Plus Jakarta Sans",ui-rounded,system-ui,-
 }
 
 /* demo (remover em produção) */
-.demo{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:10000;border:0;border-radius:99px;padding:12px 20px;font-family:inherit;font-weight:700;font-size:14px;background:#f5f4ee;color:#1c1917;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.25)}
 </style>
 </head>
 <body>
@@ -199,7 +196,7 @@ body{background:var(--bg);font-family:"Plus Jakarta Sans",ui-rounded,system-ui,-
   };
 
   ContabilisLoader.show();
-  setTimeout(function(){ ContabilisLoader.hide(); }, 2800);
+  setTimeout(function(){ ContabilisLoader.hide(); }, 6500);
 })();
 </script>
 </body>

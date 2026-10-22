@@ -15,11 +15,8 @@ import {
   Bell,
   FileSpreadsheet,
   Settings,
-  Sun,
-  Moon,
   X
 } from "lucide-react";
-import { useTheme } from "@/lib/theme";
 
 interface SidebarProps {
   isMobileOpen: boolean;
@@ -28,7 +25,6 @@ interface SidebarProps {
 
 export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     onCloseMobile();
@@ -151,36 +147,6 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
 
         {/* Footer Actions */}
         <div className="flex flex-col items-center gap-1.5 w-full pt-2 border-t" style={{ borderColor: "var(--line)" }}>
-          {/* Alternador de Tema */}
-          <button
-            onClick={toggleTheme}
-            className={`group relative h-11 rounded-2xl flex items-center justify-center transition-colors cursor-pointer ${
-              isMobileOpen ? "w-full px-3 gap-3 justify-start" : "w-11"
-            }`}
-            style={{ color: "var(--tx2)" }}
-            aria-label="Alternar tema"
-          >
-            {theme === "dark" ? (
-              <Sun className="h-5 w-5 shrink-0 stroke-[1.75]" />
-            ) : (
-              <Moon className="h-5 w-5 shrink-0 stroke-[1.75]" />
-            )}
-            {isMobileOpen ? (
-              <span className="text-xs">Alternar tema</span>
-            ) : (
-              <span
-                className="absolute left-14 top-1/2 -translate-y-1/2 -translate-x-1 whitespace-nowrap px-2.5 py-1.5 rounded-xl text-xs font-medium opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-150 delay-150 z-50 border shadow-lg"
-                style={{
-                  background: "var(--surf)",
-                  borderColor: "var(--line)",
-                  color: "var(--tx)",
-                }}
-              >
-                Alternar tema
-              </span>
-            )}
-          </button>
-
           {/* Configurações */}
           <Link
             href="/configuracoes"

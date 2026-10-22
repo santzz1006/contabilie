@@ -40,30 +40,6 @@ body:has(.login-page)::before {
   top: -140px;
 }
 
-.login-theme {
-  position: fixed;
-  top: calc(14px + env(safe-area-inset-top, 0px));
-  right: 16px;
-  z-index: 5;
-  display: grid;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-  border: 1px solid var(--glass-line);
-  border-radius: 13px;
-  background: var(--glass);
-  color: var(--tx2);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  cursor: pointer;
-}
-
-.login-theme svg {
-  width: 18px;
-  height: 18px;
-  stroke-width: 1.75;
-}
-
 .login-wrap {
   position: relative;
   z-index: 1;
@@ -449,7 +425,6 @@ body:has(.login-page)::before {
 .signup-form-panel .login-input-wrap { margin-bottom:11px; }
 .signup-form-panel .login-input-wrap input { height:44px; }
 .signup-form-panel .login-message { margin-top:2px; }
-.signup-theme { position:absolute; top:12px; right:12px; }
 
 @media (max-width: 820px) {
   .login-card {
