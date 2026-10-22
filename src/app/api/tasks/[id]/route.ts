@@ -8,7 +8,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const tenantId = body.tenantId || 'org-contabil-alpha';
+    const tenantId = request.headers.get('x-contabilis-tenant') || '';
 
     const tasks = db.getTasks(tenantId);
     const existing = tasks.find(t => t.id === id);
@@ -27,8 +27,8 @@ export async function PATCH(
     db.logAuditEvent({
       id: `aud-${Date.now()}`,
       tenantId,
-      userId: 'usr-analista-1',
-      userName: 'Guilherme Siqueira',
+      userId: request.headers.get('x-contabilis-user') || '',
+      userName: db.getUserById(request.headers.get('x-contabilis-user') || '')?.name || 'Usu?rio',
       action: 'ATUALIZAR_STATUS_TAREFA',
       resource: 'Obrigações e Tarefas',
       details: `Tarefa "${updated.title}" alterada para "${updated.status}".`,

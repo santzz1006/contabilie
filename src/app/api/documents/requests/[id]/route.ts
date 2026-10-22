@@ -8,7 +8,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const tenantId = body.tenantId || 'org-contabil-alpha';
+    const tenantId = request.headers.get('x-contabilis-tenant') || '';
 
     const requests = db.getDocumentRequests(tenantId);
     const existing = requests.find(r => r.id === id);
@@ -27,8 +27,8 @@ export async function PATCH(
     db.logAuditEvent({
       id: `aud-${Date.now()}`,
       tenantId,
-      userId: 'usr-analista-1',
-      userName: 'Guilherme Siqueira',
+      userId: request.headers.get('x-contabilis-user') || '',
+      userName: db.getUserById(request.headers.get('x-contabilis-user') || '')?.name || 'Usu?rio',
       action: 'ATUALIZAR_STATUS_DOCUMENTO',
       resource: 'Solicitação de Documento',
       details: `Status da solicitação "${updated.title}" alterado para "${updated.status}". ${body.reviewNotes ? `Motivo: ${body.reviewNotes}` : ''}`,

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
+import { MobileUnavailableGate } from '@/components/layout/mobile-unavailable-gate';
 
 export const metadata: Metadata = {
   title: 'SaaS Contábil B2B | Plataforma Operacional para Escritórios',
@@ -20,7 +21,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="min-h-screen bg-slate-50 text-slate-900 antialiased font-sans">
-        <div className="contabilis-app-content min-h-screen">{children}</div>
+        <div className="contabilis-app-content min-h-screen"><MobileUnavailableGate>{children}</MobileUnavailableGate></div>
       </body>
     </html>
   );

@@ -324,7 +324,7 @@ export default function LoginPage() {
     requestAnimationFrame(() => setMood("error"));
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isLoading) return;
     emailRef.current?.removeAttribute("aria-invalid");
@@ -343,13 +343,21 @@ export default function LoginPage() {
 
     setMood("mouse");
     setIsLoading(true);
-    submitTimer.current = setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const response = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim(), password, remember: keepConnected }) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Não foi possível entrar.");
       setIsConfirmed(true);
-      setMessage("Acesso confirmado. Esta é uma demonstração; nenhum dado foi enviado.");
-      setMessageType("success");
       setMood("happy");
-    }, 1200);
+      const requested = new URLSearchParams(window.location.search).get("next");
+      window.location.assign(requested?.startsWith("/") && !requested.startsWith("//") ? requested : result.user.role === "client" ? "/portal" : "/painel");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Não foi possível entrar agora.");
+      setMessageType("error");
+      setMood("error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const togglePassword = () => {
@@ -439,7 +447,7 @@ export default function LoginPage() {
                   <input type="checkbox" checked={keepConnected} onChange={(event) => setKeepConnected(event.target.checked)} />
                   Manter conectado por 30 dias
                 </label>
-                <button type="button" className="login-link" disabled title="Indisponível nesta demonstração">Esqueci a senha</button>
+                <Link href="/esqueci-senha.html" className="login-link">Esqueci a senha</Link>
               </div>
 
               <p className={`login-message ${messageType}`} role="alert" aria-live="polite">{message}</p>
@@ -447,19 +455,14 @@ export default function LoginPage() {
                 {isLoading && <span className="login-spinner" aria-hidden="true" />}
                 <span>{isLoading ? "Entrando" : isConfirmed ? "Acesso confirmado" : "Entrar"}</span>
               </button>
-              {isConfirmed && (
-                <Link className="login-demo-link" href="/dashboard">Abrir painel de demonstração</Link>
-              )}
             </form>
 
-            <div className="login-divider login-fx">ou</div>
-            <button className="login-submit login-google login-fx" type="button" disabled title="Indisponível nesta demonstração">Entrar com Google</button>
-            <p className="login-foot login-fx">Ainda não tem conta? <button className="login-link" type="button" disabled title="Indisponível nesta demonstração">Falar com a equipe</button></p>
+            <div className="login-divider login-fx">Primeiro acesso?</div>
+            <Link className="login-submit login-google login-fx" href="/criar-conta">Criar conta do escritório</Link>
           </section>
         </article>
 
         <p className="login-caption">Digite a senha e observe como eles reagem.</p>
-        <p className="login-demo-note">Demonstração: aceita qualquer e-mail válido e senha com 6 ou mais caracteres. Nenhum dado é enviado.</p>
       </div>
     </main>
   );

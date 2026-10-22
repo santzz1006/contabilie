@@ -24,18 +24,18 @@ import { formatDate } from "@/lib/utils";
 
 export default function ClientPortalPage() {
   const [requests, setRequests] = useState<DocumentRequest[]>([]);
+  const [clientId, setClientId] = useState("");
+  const [clientName, setClientName] = useState("Portal do cliente");
+  const [organizationName, setOrganizationName] = useState("");
   const [selectedRequest, setSelectedRequest] = useState<DocumentRequest | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadFeedback, setUploadFeedback] = useState<{ type: 'success' | 'warning' | 'error'; message: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  // Cliente simulado TechSolutions
-  const clientId = "cli-tech-1";
-  const clientName = "TechSolutions Software";
-
   const loadRequests = async () => {
     try {
+      if (!clientId) return;
       const res = await fetch(`/api/documents/requests?clientId=${clientId}`);
       if (res.ok) {
         const data: DocumentRequest[] = await res.json();
@@ -50,8 +50,14 @@ export default function ClientPortalPage() {
   };
 
   useEffect(() => {
-    loadRequests();
+    fetch("/api/auth/me").then((response) => response.ok ? response.json() : Promise.reject(new Error("Sessão não autorizada"))).then((profile) => {
+      setClientId(profile.user.clientId || "");
+      setClientName(profile.client?.tradeName || profile.client?.name || "Portal do cliente");
+      setOrganizationName(profile.organization || "");
+    }).catch(() => setUploadFeedback({ type: "error", message: "Entre com o usuário do cliente para acessar este portal." }));
   }, []);
+
+  useEffect(() => { if (clientId) loadRequests(); }, [clientId]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -143,7 +149,7 @@ export default function ClientPortalPage() {
         <div className="rounded-xl bg-[var(--dk)] text-[var(--dk-tx)] p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-[var(--dk-tx)]">
-              Competência: 10/2026
+              Competência: {selectedRequest?.competence || new Intl.DateTimeFormat("pt-BR", { month: "2-digit", year: "numeric" }).format(new Date())}
             </span>
             <Badge variant="outline" className="border-emerald-500/40 text-[var(--dk-tx)] text-[10px]">
               {pendingRequests.length} pendentes
@@ -338,7 +344,7 @@ export default function ClientPortalPage() {
       {/* Footer */}
       <footer className="py-4 text-center border-t border-slate-200 bg-white">
         <p className="text-[11px] text-slate-400">
-          Alpha Contabilidade & Gestão Tributária • Ambiente do Cliente LGPD
+          {organizationName || "Portal do cliente"} • Ambiente do Cliente
         </p>
       </footer>
     </div>

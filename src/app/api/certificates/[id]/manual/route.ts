@@ -9,7 +9,7 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await request.json();
-    const tenantId = 'org-contabil-alpha';
+    const tenantId = request.headers.get('x-contabilis-tenant') || '';
 
     const certs = db.getCertificates(tenantId);
     const existing = certs.find(c => c.id === id);
@@ -35,8 +35,8 @@ export async function POST(
     db.logAuditEvent({
       id: `aud-${Date.now()}`,
       tenantId,
-      userId: 'usr-analista-1',
-      userName: 'Guilherme Siqueira',
+      userId: request.headers.get('x-contabilis-user') || '',
+      userName: db.getUserById(request.headers.get('x-contabilis-user') || '')?.name || 'Usu?rio',
       action: 'REGISTRO_MANUAL_CND',
       resource: 'Certidões',
       details: `Registro manual de ${updated.title}. Protocolo: ${updated.protocolNumber}, Validade: ${updated.validityDate}.`,

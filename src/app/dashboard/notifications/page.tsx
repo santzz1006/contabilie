@@ -24,19 +24,12 @@ import { formatDate } from "@/lib/utils";
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
-  const [selectedClientId, setSelectedClientId] = useState<string>("cli-tech-1");
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [channel, setChannel] = useState<'whatsapp' | 'email'>('whatsapp');
   const [templateType, setTemplateType] = useState<'cobranca_docs' | 'aviso_guia_das' | 'certidao_renovada'>('cobranca_docs');
   const [isSending, setIsSending] = useState(false);
   const [sendSuccess, setSendSuccess] = useState(false);
-
-  // Status de Integração Oficial do WhatsApp
-  const [whatsappConfig, setWhatsappConfig] = useState({
-    provider: "WhatsApp Cloud API Oficial (Meta)",
-    configured: true,
-    phoneNumber: "+55 (11) 3456-7890",
-    status: "online" as "online" | "offline",
-  });
+  const [sendFeedback, setSendFeedback] = useState("");
 
   const loadData = async () => {
     try {
@@ -44,7 +37,7 @@ export default function NotificationsPage() {
         fetch("/api/clients"),
         fetch("/api/notifications")
       ]);
-      if (resClients.ok) setClients(await resClients.json());
+      if (resClients.ok) { const loaded: Client[] = await resClients.json(); setClients(loaded); setSelectedClientId((current) => loaded.some((c) => c.id === current) ? current : loaded[0]?.id || ""); }
       if (resNotifs.ok) setNotifications(await resNotifs.json());
     } catch (e) {
       console.error(e);
@@ -58,45 +51,29 @@ export default function NotificationsPage() {
   const selectedClient = clients.find(c => c.id === selectedClientId);
 
   const getTemplateMessage = () => {
-    const nome = selectedClient?.tradeName || "Cliente";
-    if (templateType === 'cobranca_docs') {
-      return `Olá, ${nome}! A Alpha Contabilidade informa: os extratos e notas da competência de Outubro/2026 estão aguardando envio. Acesse com segurança pelo seu celular no portal oficial: https://alphacontabil.com.br/portal`;
-    }
-    if (templateType === 'aviso_guia_das') {
-      return `Olá, ${nome}! Sua guia DAS do Simples Nacional já foi apurada por nossa equipe contábil e está disponível para download com vencimento em 20/11/2026.`;
-    }
-    return `Olá, ${nome}! Informamos que a sua Certidão de Regularidade perante a Receita Federal foi consultada e renovada com sucesso.`;
+    const name = selectedClient?.tradeName || "Cliente";
+    if (templateType === "cobranca_docs") return "Olá, " + name + "! Há documentos pendentes para envio ao seu escritório de contabilidade. Confirme com a equipe quais arquivos e competência estão pendentes.";
+    if (templateType === "aviso_guia_das") return "Olá, " + name + "! Consulte com a equipe contábil a situação da sua guia DAS e o respectivo vencimento.";
+    return "Olá, " + name + "! Entre em contato com a equipe contábil para confirmar a situação da sua certidão.";
   };
 
-  const handleSendNotification = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedClient) return;
-
-    setIsSending(true);
-    setSendSuccess(false);
-
+  const handleSendNotification = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!selectedClient) { setSendFeedback("Cadastre ou selecione um cliente primeiro."); setSendSuccess(true); return; }
+    const recipient = channel === "whatsapp" ? selectedClient.phone : selectedClient.email;
+    if (!recipient) { setSendFeedback(channel === "whatsapp" ? "Cadastre o telefone do cliente." : "Cadastre o e-mail do cliente."); setSendSuccess(true); return; }
+    setIsSending(true); setSendSuccess(false); setSendFeedback("");
     try {
-      const res = await fetch("/api/notifications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          channel,
-          recipient: channel === 'whatsapp' ? selectedClient.phone : selectedClient.email,
-          title: templateType === 'cobranca_docs' ? 'Solicitação de Documentos Mensais' : 'Comunicado Contábil Oficial',
-          message: getTemplateMessage(),
-        }),
-      });
-
-      if (res.ok) {
-        setSendSuccess(true);
-        await loadData();
-        setTimeout(() => setSendSuccess(false), 3000);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsSending(false);
-    }
+      const title = templateType === "cobranca_docs" ? "Solicitação de documentos" : templateType === "aviso_guia_das" ? "Consulta sobre guia DAS" : "Consulta sobre certidão";
+      const message = getTemplateMessage();
+      const target = channel === "whatsapp" ? "https://wa.me/" + recipient.replace(/\D/g, "") + "?text=" + encodeURIComponent(message) : "mailto:" + encodeURIComponent(recipient) + "?subject=" + encodeURIComponent(title) + "&body=" + encodeURIComponent(message);
+      window.open(target, "_blank", "noopener,noreferrer");
+      const response = await fetch("/api/notifications", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ channel, recipient, title, message }) });
+      if (!response.ok) { const result = await response.json(); throw new Error(result.error || "Não foi possível preparar a mensagem."); }
+      setSendFeedback("Mensagem preparada para " + recipient + ". Confirme o envio no aplicativo; a entrega não é monitorada automaticamente.");
+      setSendSuccess(true); await loadData(); setTimeout(() => setSendSuccess(false), 4000);
+    } catch (error) { setSendFeedback(error instanceof Error ? error.message : "Falha ao preparar mensagem."); setSendSuccess(true); }
+    finally { setIsSending(false); }
   };
 
   return (
@@ -114,7 +91,7 @@ export default function NotificationsPage() {
 
         <Badge variant="outline" className="border-emerald-300 bg-emerald-50 text-emerald-800 text-xs px-3 py-1">
           <Shield className="h-3.5 w-3.5 text-emerald-600 mr-1.5" />
-          <span>Canal de Notificação Verificado</span>
+            <span>Integração pendente de configuração</span>
         </Badge>
       </div>
 
@@ -129,13 +106,13 @@ export default function NotificationsPage() {
           <CardContent className="p-4 pt-0 flex items-center justify-between">
             <div>
               <span className="text-sm font-bold text-slate-800 block">
-                {whatsappConfig.provider}
+                WhatsApp (envio manual)
               </span>
               <span className="text-[11px] text-slate-500 font-mono">
-                {whatsappConfig.phoneNumber}
+                Abra a conversa e confirme o envio
               </span>
             </div>
-            <Badge variant="success">Conectado</Badge>
+            <Badge variant="warning">Não conectado</Badge>
           </CardContent>
         </Card>
 
@@ -151,10 +128,10 @@ export default function NotificationsPage() {
                 Serviço SMTP Corporativo
               </span>
               <span className="text-[11px] text-slate-500">
-                notificacoes@alphacontabil.com.br
+                Abra uma mensagem no seu cliente de e-mail
               </span>
             </div>
-            <Badge variant="success">Ativo</Badge>
+            <Badge variant="warning">Sem envio automático</Badge>
           </CardContent>
         </Card>
 
@@ -173,9 +150,9 @@ export default function NotificationsPage() {
       </div>
 
       {sendSuccess && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 rounded-lg flex items-center gap-2">
-          <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-          <span>Notificação enviada com sucesso para o cliente!</span>
+        <div className="p-3 rounded-lg border text-xs flex items-center gap-2" style={{ background: "var(--or-s)", borderColor: "var(--line)", color: "var(--tx)" }}>
+          <CheckCircle2 className="h-4 w-4" style={{ color: "var(--or)" }} />
+          <span>{sendFeedback || "Conversa aberta no WhatsApp para revisão e envio manual."}</span>
         </div>
       )}
 
@@ -198,9 +175,11 @@ export default function NotificationsPage() {
                   </label>
                   <select
                     value={selectedClientId}
+                    disabled={clients.length === 0}
                     onChange={(e) => setSelectedClientId(e.target.value)}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                   >
+                    {clients.length === 0 && <option value="">Nenhum cliente cadastrado</option>}
                     {clients.map(c => (
                       <option key={c.id} value={c.id}>{c.tradeName}</option>
                     ))}
@@ -273,7 +252,7 @@ export default function NotificationsPage() {
                   className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-xs"
                 >
                   <Send className="h-4 w-4" />
-                  <span>{isSending ? "Enviando..." : "Disparar Mensagem Agora"}</span>
+                  <span>{isSending ? "Preparando..." : channel === "whatsapp" ? "Abrir WhatsApp e preparar" : "Abrir e-mail e preparar"}</span>
                 </Button>
               </form>
             </CardContent>
@@ -318,7 +297,7 @@ export default function NotificationsPage() {
                       </div>
                     </div>
 
-                    <Badge variant="success" className="text-[10px] shrink-0">
+                    <Badge variant={notif.status === "enviado" ? "success" : notif.status === "falha" ? "destructive" : "warning"} className="text-[10px] shrink-0">
                       {notif.status}
                     </Badge>
                   </div>

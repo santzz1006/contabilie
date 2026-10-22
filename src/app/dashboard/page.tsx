@@ -24,6 +24,8 @@ export default function DashboardPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [isModalClientOpen, setIsModalClientOpen] = useState(false);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [selectedActivity, setSelectedActivity] = useState<{ client: string; activity: string; responsible: string; status: string; time: string } | null>(null);
 
   // Competências
   const comps = [
@@ -72,6 +74,10 @@ export default function DashboardPage() {
   const countRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Entrada orquestrada com GSAP
+  useEffect(() => {
+    fetch("/api/clients").then(response => response.ok ? response.json() : []).then(setClients).catch(() => setClients([]));
+  }, []);
+
   useEffect(() => {
     const isReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -449,7 +455,7 @@ export default function DashboardPage() {
         </article>
 
         {/* Tabela de Atividades Recentes (8 cols) */}
-        <article className="anim-act lg:col-span-8 contabilis-card p-5">
+        <article id="activities" className="anim-act lg:col-span-8 contabilis-card p-5 scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
             <h3 className="text-sm font-semibold" style={{ color: "var(--tx)" }}>
               Atividades recentes
@@ -515,6 +521,7 @@ export default function DashboardPage() {
                   <th className="py-2 px-2.5 font-medium">Responsável</th>
                   <th className="py-2 px-2.5 font-medium">Status</th>
                   <th className="py-2 px-2.5 font-medium">Horário</th>
+                  <th className="py-2 px-2.5 font-medium">Ação</th>
                 </tr>
               </thead>
               <tbody>
@@ -544,6 +551,18 @@ export default function DashboardPage() {
                     </td>
                     <td className="py-2.5 px-2.5 num" style={{ color: "var(--tx2)" }}>
                       {row.time}
+                    </td>
+                    <td className="py-2.5 px-2.5 whitespace-nowrap">
+                      {row.status === "ok" ? (
+                        <button onClick={() => setSelectedActivity(row)} className="text-xs font-semibold" style={{ color: "var(--or)" }}>Detalhes</button>
+                      ) : row.status === "w" ? (
+                        <Link href="/dashboard/documents" className="text-xs font-semibold" style={{ color: "var(--or)" }}>Conferir</Link>
+                      ) : row.activity.toLowerCase().includes("certid") ? (
+                        <Link href="/dashboard/certificates" className="text-xs font-semibold" style={{ color: "var(--or)" }}>Emitir CND</Link>
+                      ) : (() => {
+                        const client = clients.find(item => item.tradeName === row.client);
+                        return client?.phone ? <button onClick={() => window.open(`https://wa.me/${client.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá, ${client.tradeName}! Há uma pendência para resolver com o escritório.`)}`, "_blank", "noopener,noreferrer")} className="text-xs font-semibold" style={{ color: "var(--or)" }}>Lembrar cliente</button> : <Link href="/dashboard/notifications" className="text-xs font-semibold" style={{ color: "var(--or)" }}>Lembrar cliente</Link>;
+                      })()}
                     </td>
                   </tr>
                 ))}
@@ -586,6 +605,20 @@ export default function DashboardPage() {
           </div>
         </article>
       </section>
+
+      {selectedActivity && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.45)" }} onClick={() => setSelectedActivity(null)}>
+          <section role="dialog" aria-modal="true" aria-labelledby="activity-detail-title" className="w-full max-w-lg rounded-2xl border p-6 shadow-2xl" style={{ background: "var(--surf)", borderColor: "var(--line)", color: "var(--tx)" }} onClick={(event) => event.stopPropagation()}>
+            <h2 id="activity-detail-title" className="text-lg font-semibold">Resumo da atividade</h2>
+            <p className="mt-1 text-sm" style={{ color: "var(--tx2)" }}>{selectedActivity.client} · {selectedActivity.activity}</p>
+            <p className="mt-4 rounded-xl p-3 text-sm" style={{ background: "var(--surf2)", color: "var(--tx2)" }}>
+              {/extrato|concilia/i.test(selectedActivity.activity) ? "Conciliação bancária registrada como concluída. Os lançamentos conferidos foram associados ao extrato desta competência." : `A atividade “${selectedActivity.activity}” foi concluída e registrada para ${selectedActivity.client}.`}
+            </p>
+            <dl className="mt-5 grid grid-cols-2 gap-4 text-sm"><div><dt className="text-xs" style={{ color: "var(--tx2)" }}>Responsável</dt><dd>{selectedActivity.responsible}</dd></div><div><dt className="text-xs" style={{ color: "var(--tx2)" }}>Horário</dt><dd>{selectedActivity.time}</dd></div><div><dt className="text-xs" style={{ color: "var(--tx2)" }}>Status</dt><dd>{statusMap[selectedActivity.status]?.label || selectedActivity.status}</dd></div><div><dt className="text-xs" style={{ color: "var(--tx2)" }}>Registro</dt><dd>Atividade concluída no período selecionado</dd></div></dl>
+            <div className="mt-5 flex justify-end"><button onClick={() => setSelectedActivity(null)} className="rounded-lg px-4 py-2 text-sm font-semibold" style={{ background: "var(--dk)", color: "var(--dk-tx)" }}>Fechar</button></div>
+          </section>
+        </div>
+      )}
 
       {/* Modal de Cadastro de Cliente */}
       {isModalClientOpen && (

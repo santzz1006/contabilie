@@ -4,7 +4,7 @@ import { WebsiteConfig } from '@/lib/types';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const tenantId = searchParams.get('tenantId') || 'org-contabil-alpha';
+  const tenantId = request.headers.get('x-contabilis-tenant') || '';
 
   const web = db.getWebsite(tenantId);
   return NextResponse.json(web);
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const tenantId = body.tenantId || 'org-contabil-alpha';
+    const tenantId = request.headers.get('x-contabilis-tenant') || '';
 
     const updatedWeb: WebsiteConfig = {
       ...body,
@@ -26,8 +26,8 @@ export async function POST(request: Request) {
     db.logAuditEvent({
       id: `aud-${Date.now()}`,
       tenantId,
-      userId: 'usr-admin-1',
-      userName: 'Carlos Mendes',
+      userId: request.headers.get('x-contabilis-user') || '',
+      userName: db.getUserById(request.headers.get('x-contabilis-user') || '')?.name || 'Usu?rio',
       action: 'PUBLICAR_SITE_CONTABIL',
       resource: 'Website Builder',
       details: `Site "${updatedWeb.siteName}" atualizado. Publicado: ${updatedWeb.published}.`,

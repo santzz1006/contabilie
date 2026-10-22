@@ -8,7 +8,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const tenantId = body.tenantId || 'org-contabil-alpha';
+    const tenantId = request.headers.get('x-contabilis-tenant') || '';
 
     const txs = db.getBankTransactions(tenantId);
     const existing = txs.find(t => t.id === id);
@@ -26,7 +26,7 @@ export async function PATCH(
       ...existing,
       status: updatedStatus,
       accountCategoryId: body.categoryId || existing.accountCategoryId,
-      reviewedBy: 'usr-analista-1',
+      reviewedBy: request.headers.get('x-contabilis-user') || '',
       reviewedAt: new Date().toISOString(),
     };
 
@@ -35,8 +35,8 @@ export async function PATCH(
     db.logAuditEvent({
       id: `aud-${Date.now()}`,
       tenantId,
-      userId: 'usr-analista-1',
-      userName: 'Guilherme Siqueira',
+      userId: request.headers.get('x-contabilis-user') || '',
+      userName: db.getUserById(request.headers.get('x-contabilis-user') || '')?.name || 'Usu?rio',
       action: 'REVISAR_TRANSACAO_BANCARIA',
       resource: 'Conciliação Bancária',
       details: `Lançamento ${existing.description} (${existing.amount}) marcado como ${updatedStatus}.`,

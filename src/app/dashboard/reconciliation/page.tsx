@@ -28,7 +28,7 @@ export default function ReconciliationPage() {
   const [transactions, setTransactions] = useState<BankTransaction[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [categories, setCategories] = useState<AccountCategory[]>([]);
-  const [selectedClientId, setSelectedClientId] = useState<string>("cli-tech-1");
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
   const [isImporting, setIsImporting] = useState(false);
   const [importSummary, setImportSummary] = useState<{ count: number; totalCredits: number; totalDebits: number } | null>(null);
@@ -41,7 +41,7 @@ export default function ReconciliationPage() {
         fetch(`/api/reconciliation/transactions?clientId=${selectedClientId}`),
         fetch("/api/reconciliation/categories")
       ]);
-      if (resClients.ok) setClients(await resClients.json());
+      if (resClients.ok) { const loaded: Client[] = await resClients.json(); setClients(loaded); setSelectedClientId((current) => loaded.some((client) => client.id === current) ? current : loaded[0]?.id || ""); }
       if (resTxs.ok) setTransactions(await resTxs.json());
       if (resCats.ok) setCategories(await resCats.json());
     } catch (e) {
@@ -56,6 +56,7 @@ export default function ReconciliationPage() {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!selectedClientId) { alert("Cadastre e selecione um cliente antes de importar o extrato."); if (fileInputRef.current) fileInputRef.current.value = ""; return; }
 
     setIsImporting(true);
     const formData = new FormData();

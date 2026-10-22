@@ -12,6 +12,9 @@
 
 # production
 /build
+/data/store.json
+/data/store.json.tmp.*
+/public/uploads/
 
 # misc
 .DS_Store
@@ -25,10 +28,9 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+.env.*
+!.env.example
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# Temporary dependency cache used only for local build checks
-/node_modules.partial-install/

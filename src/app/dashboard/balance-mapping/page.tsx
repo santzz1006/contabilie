@@ -23,7 +23,7 @@ export default function BalanceMappingPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [transactions, setTransactions] = useState<BankTransaction[]>([]);
   const [categories, setCategories] = useState<AccountCategory[]>([]);
-  const [selectedClientId, setSelectedClientId] = useState<string>("cli-tech-1");
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [isExporting, setIsExporting] = useState(false);
 
   const loadData = async () => {
@@ -33,7 +33,7 @@ export default function BalanceMappingPage() {
         fetch(`/api/reconciliation/transactions?clientId=${selectedClientId}`),
         fetch("/api/reconciliation/categories")
       ]);
-      if (resClients.ok) setClients(await resClients.json());
+      if (resClients.ok) { const loaded: Client[] = await resClients.json(); setClients(loaded); setSelectedClientId((current) => loaded.some((client) => client.id === current) ? current : loaded[0]?.id || ""); }
       if (resTxs.ok) setTransactions(await resTxs.json());
       if (resCats.ok) setCategories(await resCats.json());
     } catch (e) {
@@ -62,11 +62,15 @@ export default function BalanceMappingPage() {
   const selectedClient = clients.find(c => c.id === selectedClientId);
 
   const handleExportDraft = () => {
-    if (pendingCount > 0) {
-      alert("Aviso de Conformidade: Existem lançamentos não conciliados ou pendentes. A exportação definitiva é bloqueada até que todas as exceções sejam revisadas pelo contador.");
-      return;
-    }
-    alert("Rascunho de Balancete Contábil gerado com sucesso para arquivo contábil SPED/CSV.");
+    const columns = ["Data", "Descrição", "Tipo", "Valor", "Status", "Plano de contas"];
+    const rows = transactions.map((transaction) => [transaction.date, transaction.description, transaction.type, transaction.amount.toFixed(2), transaction.status, categories.find((category) => category.id === transaction.accountCategoryId)?.name || "Sem classificação"]);
+    const csv = [columns, ...rows].map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(";")).join("\r\n");
+    const url = URL.createObjectURL(new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" }));
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `lancamentos-${selectedClient?.tradeName?.replace(/[^a-z0-9-]/gi, "-") || "escritorio"}.csv`;
+    anchor.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -98,7 +102,7 @@ export default function BalanceMappingPage() {
             className={`gap-2 ${pendingCount > 0 ? 'bg-slate-700 hover:bg-slate-800' : 'bg-emerald-600 hover:bg-emerald-700'}`}
           >
             {pendingCount > 0 ? <Lock className="h-4 w-4" /> : <Download className="h-4 w-4" />}
-            <span>Exportar Balancete / DRE</span>
+            <span>Exportar lançamentos CSV</span>
           </Button>
         </div>
       </div>

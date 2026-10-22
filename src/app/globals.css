@@ -164,6 +164,19 @@ body::before {
   color: #2A1608 !important;
 }
 
+:root[data-theme="dark"] .contabilis-app-content [class~="bg-slate-900"],
+:root[data-theme="dark"] .contabilis-app-content [class~="bg-slate-950"] {
+  background-color: var(--dk) !important;
+  color: var(--dk-tx) !important;
+}
+:root[data-theme="dark"] .contabilis-app-content [class~="bg-gradient-to-b"] {
+  background-image: linear-gradient(to bottom, var(--surf), var(--surf2)) !important;
+}
+:root[data-theme="dark"] .contabilis-app-content img[src*="contabilis-simbolo-escuro.svg"] {
+  background-color: #F5F4EE;
+  padding: 3px;
+}
+
 /* Trilho Neumórfico da Barra de Progresso */
 .contabilis-track {
   height: 8px;

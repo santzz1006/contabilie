@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("theme")|| (matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}catch{document.documentElement.dataset.theme=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}</script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contabilis · Carregando</title>
+<style>
+:root{--bg:#262523;--stage:#3a3936;--card:#30302e;--floor:#2f2e2c;--ink:#f5f4ee;--muted:#a9a69e;--track:#454340;color-scheme:dark}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f3efe6;--stage:#ece7dc;--card:#fffdf9;--floor:#e0dacd;--ink:#1c1917;--muted:#6f6a5f;--track:#e6e0d3;color-scheme:light}}
+:root[data-theme="light"]{--bg:#f3efe6;--stage:#ece7dc;--card:#fffdf9;--floor:#e0dacd;--ink:#1c1917;--muted:#6f6a5f;--track:#e6e0d3;color-scheme:light}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);font-family:"Plus Jakarta Sans",ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink)}
+
+/* ====== CONTABILIS LOADER ====== */
+.cbl{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:20px;background:var(--bg);transition:opacity .4s ease,visibility .4s}
+.cbl.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
+.cbl-card{width:min(420px,100%);background:var(--card);border-radius:28px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.28);animation:cardIn .7s cubic-bezier(.2,.8,.2,1) both}
+.cbl-stage{background:var(--stage)}
+.cbl-stage svg{display:block;width:100%;height:auto}
+.cbl-body{padding:6px 28px 30px;text-align:center}
+.cbl-brand{display:inline-flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.01em}
+.cbl-brand img{background:#f5f4ee;padding:4px;border-radius:10px;object-fit:contain;flex:none}
+.cbl-brand i{width:34px;height:34px;border-radius:10px;background:#ff8a4c;display:grid;place-items:center}
+.cbl-title{margin:16px 0 6px;font-size:27px;line-height:1.1;font-weight:800;letter-spacing:-.035em}
+.cbl-msg{margin:0;min-height:22px;font-size:15px;color:var(--muted);transition:opacity .25s,transform .25s}
+.cbl-msg.out{opacity:0;transform:translateY(4px)}
+.cbl-track{margin:22px auto 0;width:100%;height:7px;border-radius:99px;background:var(--track);overflow:hidden}
+.cbl-fill{height:100%;width:36%;border-radius:99px;background:linear-gradient(90deg,#ff8a4c,#fbbf24);animation:slide 1.5s cubic-bezier(.6,0,.4,1) infinite}
+.cbl-track.det .cbl-fill{animation:none;transition:width .35s ease}
+
+/* personagens */
+.hop,.sh,.bar{transform-box:fill-box}
+.hop{transform-origin:50% 100%;animation:hop 2.6s cubic-bezier(.3,.1,.3,1) infinite}
+.sh{transform-origin:50% 50%;animation:sh 2.6s cubic-bezier(.3,.1,.3,1) infinite}
+.c1{animation-delay:0s}.c2{animation-delay:.18s}.c3{animation-delay:.36s}.c4{animation-delay:.54s}
+.bar{transform-origin:50% 100%;animation:grow 2.6s ease-in-out infinite}
+.eye{transform-box:fill-box;transform-origin:50% 50%;animation:blink 4.2s infinite}
+.pp{animation:look 3.2s ease-in-out infinite}
+.num{font:800 8.5px ui-monospace,"SF Mono",Menlo,monospace;fill:#ffb86b;letter-spacing:.02em}
+@keyframes hop{0%,62%,100%{transform:none}8%{transform:scale(1.07,.9)}26%{transform:translateY(-20px) scale(.96,1.06)}44%{transform:scale(1.07,.9)}52%{transform:scale(.98,1.03)}}
+@keyframes sh{0%,62%,100%{transform:none;opacity:1}26%{transform:scaleX(.72);opacity:.5}}
+@keyframes grow{0%{transform:scaleY(.2)}35%,70%{transform:scaleY(1)}100%{transform:scaleY(.2)}}
+@keyframes blink{0%,94%,100%{transform:none}97%{transform:scaleY(.1)}}
+@keyframes look{0%,20%{transform:none}35%,55%{transform:translateX(1.6px)}70%,90%{transform:translateX(-1.6px)}100%{transform:none}}
+@keyframes slide{0%{transform:translateX(-100%)}100%{transform:translateX(280%)}}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.cbl *{animation-duration:.01ms!important;animation-iteration-count:1!important}.cbl-fill{width:60%!important}}
+
+/* etapas (aparecem só no desktop) */
+.cbl-steps{display:none;list-style:none;margin:24px 0 0;padding:0}
+.cbl-steps li{display:flex;align-items:center;gap:12px;padding:8px 0;font-size:15px;font-weight:600;color:var(--muted);transition:color .3s}
+.cbl-steps .dot{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--track);display:grid;place-items:center;transition:background .3s,border-color .3s}
+.cbl-steps .dot svg{width:12px;height:12px;opacity:0;transform:scale(.4);transition:opacity .3s,transform .3s}
+.cbl-steps li.active,.cbl-steps li.done{color:var(--ink)}
+.cbl-steps li.active .dot{border-color:#ff8a4c;border-top-color:transparent;animation:spin .8s linear infinite}
+.cbl-steps li.done .dot{background:#ff8a4c;border-color:#ff8a4c}
+.cbl-steps li.done .dot svg{opacity:1;transform:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* versão desktop */
+@media (min-width:900px){
+.cbl-card{width:min(1080px,94vw);display:grid;grid-template-columns:1.45fr 1fr;border-radius:36px}
+.cbl-stage{display:flex;background:linear-gradient(90deg,var(--stage) 78%,var(--card))}
+.cbl-stage svg{height:100%;-webkit-mask-image:linear-gradient(90deg,#000 80%,transparent);mask-image:linear-gradient(90deg,#000 80%,transparent)}
+.cbl-body{padding:52px 56px 48px 20px;text-align:left;align-self:center}
+.cbl-title{font-size:40px;margin:22px 0 10px}
+.cbl-msg{font-size:17px}
+.cbl-track{margin-top:26px;height:8px}
+.cbl-steps{display:block}
+}
+
+/* demo (remover em produção) */
+.demo{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:10000;border:0;border-radius:99px;padding:12px 20px;font-family:inherit;font-weight:700;font-size:14px;background:#f5f4ee;color:#1c1917;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+</style>
+</head>
+<body>
+
+<div class="cbl" id="cbl" role="status" aria-live="polite" aria-label="Carregando">
+  <div class="cbl-card">
+    <div class="cbl-stage">
+      <svg viewBox="3 0 340 210" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+        <defs><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--floor)"/><stop offset=".2" style="stop-color:var(--floor)"/><stop offset="1" style="stop-color:var(--card)"/></linearGradient></defs>
+        <rect x="0" y="176" width="360" height="35" fill="url(#fg)"/>
+        <!-- gráfico crescendo -->
+        <g>
+          <rect x="122" y="61" width="102" height="2.4" rx="1.2" fill="#fff" opacity=".18"/>
+          <rect class="bar" style="animation-delay:0s" x="128" y="46" width="10" height="14" rx="3" fill="#ff8a4c"/>
+          <rect class="bar" style="animation-delay:.1s" x="144" y="36" width="10" height="24" rx="3" fill="#fdba74"/>
+          <rect class="bar" style="animation-delay:.2s" x="160" y="42" width="10" height="18" rx="3" fill="#fbbf24"/>
+          <rect class="bar" style="animation-delay:.3s" x="176" y="26" width="10" height="34" rx="3" fill="#ff8a4c"/>
+          <rect class="bar" style="animation-delay:.4s" x="192" y="32" width="10" height="28" rx="3" fill="#fdba74"/>
+          <rect class="bar" style="animation-delay:.5s" x="208" y="18" width="10" height="42" rx="3" fill="#fbbf24"/>
+        </g>
+        <!-- sombras -->
+        <ellipse class="sh c1" cx="63" cy="179" rx="30" ry="4" fill="#000" opacity=".2"/>
+        <ellipse class="sh c2" cx="148" cy="179" rx="28" ry="4" fill="#000" opacity=".2"/>
+        <ellipse class="sh c3" cx="214" cy="179" rx="29" ry="4" fill="#000" opacity=".2"/>
+        <ellipse class="sh c4" cx="290" cy="179" rx="24" ry="4" fill="#000" opacity=".2"/>
+        <!-- livro-caixa -->
+        <g class="hop c1">
+          <rect x="34" y="70" width="58" height="106" rx="10" fill="#57534c"/>
+          <path d="M76 70v15l6-5 6 5V70z" fill="#ff8a4c"/>
+          <rect x="46" y="134" width="34" height="3" rx="1.5" fill="#7a766d"/><rect x="46" y="146" width="34" height="3" rx="1.5" fill="#7a766d"/><rect x="46" y="158" width="22" height="3" rx="1.5" fill="#7a766d"/>
+          <g class="face" data-f="63,104,22,7,92,118,12"></g>
+        </g>
+        <!-- moeda -->
+        <g class="hop c2">
+          <circle cx="148" cy="146" r="30" fill="#ff8a4c"/>
+          <circle cx="148" cy="146" r="24" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="2"/>
+          <text x="148" y="127" text-anchor="middle" font-size="11" font-weight="800" fill="#ffd2b5" font-family="system-ui,sans-serif">R$</text>
+          <g class="face" data-f="148,143,22,6.5,133,158,10"></g>
+        </g>
+        <!-- calculadora -->
+        <g class="hop c3">
+          <rect x="186" y="82" width="56" height="94" rx="10" fill="#fdba74"/>
+          <rect x="194" y="90" width="40" height="16" rx="4" fill="#3a2f27"/>
+          <text id="cblNum" class="num" x="231" y="101.5" text-anchor="end">0,00</text>
+          <g class="face" data-f="214,124,22,5.5,114,137,10"></g>
+          <rect x="196" y="147" width="10" height="8" rx="2.5" fill="#d99a5c"/><rect x="210" y="147" width="10" height="8" rx="2.5" fill="#d99a5c"/><rect x="224" y="147" width="10" height="8" rx="2.5" fill="#d99a5c"/>
+          <rect x="196" y="159" width="10" height="8" rx="2.5" fill="#d99a5c"/><rect x="210" y="159" width="10" height="8" rx="2.5" fill="#d99a5c"/><rect x="224" y="159" width="10" height="8" rx="2.5" fill="#ff8a4c"/>
+        </g>
+        <!-- porcentagem -->
+        <g class="hop c4">
+          <path d="M268 176V134a22 22 0 0 1 44 0V176Z" fill="#fbbf24"/>
+          <text x="290" y="130" text-anchor="middle" font-size="14" font-weight="800" fill="#b57606" font-family="system-ui,sans-serif">%</text>
+          <g class="face" data-f="290,149,16,5,140,161,9"></g>
+        </g>
+      </svg>
+    </div>
+    <div class="cbl-body">
+      <div class="cbl-brand"><img src="/contabilis-simbolo-escuro.svg" width="38" height="38" alt="">Contabilis</div>
+      <h1 class="cbl-title" id="cblTitle">Carregando seu escritório</h1>
+      <p class="cbl-msg" id="cblMsg">Conferindo lançamentos…</p>
+      <div class="cbl-track" id="cblTrack"><div class="cbl-fill" id="cblFill"></div></div>
+      <ul class="cbl-steps" id="cblSteps" aria-hidden="true">
+        <li><span class="dot"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.4l2.4 2.4 4.6-5" stroke="#1c1917" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Lançamentos conferidos</li>
+        <li><span class="dot"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.4l2.4 2.4 4.6-5" stroke="#1c1917" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Extratos conciliados</li>
+        <li><span class="dot"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.4l2.4 2.4 4.6-5" stroke="#1c1917" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Balancete fechado</li>
+        <li><span class="dot"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.4l2.4 2.4 4.6-5" stroke="#1c1917" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Carteira de clientes pronta</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+/* Uso no site:
+   ContabilisLoader.show('Carregando clientes…');  // mostra (texto opcional)
+   ContabilisLoader.progress(60);                  // opcional: barra determinada (0–100)
+   ContabilisLoader.hide();                        // esconde
+   ContabilisLoader.wrap(fetch('/api/clientes'));  // mostra enquanto a promessa roda */
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var root=$('cbl'),msg=$('cblMsg'),title=$('cblTitle'),track=$('cblTrack'),fill=$('cblFill'),num=$('cblNum');
+  var MSGS=['Conferindo lançamentos…','Conciliando extratos…','Fechando o balancete…','Calculando impostos…','Organizando a carteira de clientes…'];
+  var fmt=new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  var NS='http://www.w3.org/2000/svg';
+
+  /* rostos dos personagens: olhos, pálpebras e boca */
+  document.querySelectorAll('.face').forEach(function(g){
+    var p=g.getAttribute('data-f').split(',').map(Number),cx=p[0],cy=p[1],gap=p[2],r=p[3],lid=p[4],my=p[5],mw=p[6],h='';
+    [cx-gap/2,cx+gap/2].forEach(function(x){
+      h+='<g class="eye"><circle cx="'+x+'" cy="'+cy+'" r="'+r+'" fill="#fff"/><circle class="pp" cx="'+x+'" cy="'+cy+'" r="'+(r*.45).toFixed(2)+'" fill="#1c1917"/></g>';
+      h+='<rect x="'+(x-r*.85)+'" y="'+lid+'" width="'+(r*1.7)+'" height="2.4" rx="1.2" fill="#1c1917"/>';
+    });
+    h+='<rect x="'+(cx-mw/2)+'" y="'+my+'" width="'+mw+'" height="2.4" rx="1.2" fill="#1c1917"/>';
+    g.innerHTML=h;
+  });
+
+  var tm=null,tn=null,ts=null,i=0,val=0,sk=0,shownAt=0,hideT=null,steps=document.querySelectorAll('#cblSteps li');
+  function setSteps(k){sk=k;steps.forEach(function(li,n){li.classList.toggle('done',n<k);li.classList.toggle('active',n===k)})}
+  function stepLoop(){setSteps(0);ts=setInterval(function(){setSteps(sk>=steps.length?0:sk+1)},1700)}
+  function rotate(){
+    msg.classList.add('out');
+    setTimeout(function(){i=(i+1)%MSGS.length;msg.textContent=MSGS[i];msg.classList.remove('out')},250);
+  }
+  function tick(){val+=Math.random()*38+4;if(val>999)val=Math.random()*20;num.textContent=fmt.format(val)}
+  function start(){if(!tm){tm=setInterval(rotate,2000);tn=setInterval(tick,130);stepLoop()}}
+  function stop(){clearInterval(tm);clearInterval(tn);clearInterval(ts);tm=tn=ts=null}
+
+  window.ContabilisLoader={
+    show:function(text){
+      clearTimeout(hideT);shownAt=Date.now();
+      if(text){stop();msg.textContent=text}else{msg.textContent=MSGS[i]}
+      root.classList.remove('is-hidden');root.setAttribute('aria-busy','true');
+      if(!text)start();else{tn=setInterval(tick,130);stepLoop()}
+    },
+    hide:function(){
+      var wait=Math.max(0,600-(Date.now()-shownAt)); /* evita piscar em cargas muito rápidas */
+      clearTimeout(hideT);
+      hideT=setTimeout(function(){root.classList.add('is-hidden');root.removeAttribute('aria-busy');setTimeout(function(){document.body.style.background='transparent'},400);setTimeout(function(){stop();track.classList.remove('det');fill.style.width=''},450)},wait);
+    },
+    progress:function(n){clearInterval(ts);ts=null;setSteps(Math.min(steps.length,Math.floor(n/25)));track.classList.add('det');fill.style.width=Math.max(0,Math.min(100,n))+'%'},
+    wrap:function(p,text){this.show(text);var h=this.hide.bind(this);return Promise.resolve(p).then(function(v){h();return v},function(e){h();throw e})}
+  };
+
+  ContabilisLoader.show();
+  setTimeout(function(){ ContabilisLoader.hide(); }, 2800);
+})();
+</script>
+</body>
+</html>

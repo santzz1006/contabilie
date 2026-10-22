@@ -279,7 +279,7 @@ export default function WebsiteBuilderPage() {
             {/* Header do Site Mockup */}
             <div className="p-4 border-b border-slate-100 flex items-center justify-between" style={{ backgroundColor: '#ffffff' }}>
               <div>
-                <span className="font-bold text-sm text-slate-900 block truncate" style={{ color: config.primaryColor }}>
+                <span className="font-bold text-sm text-slate-900 block truncate">
                   {config.siteName}
                 </span>
                 <span className="text-[10px] text-slate-500 block truncate">

@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contabilis · Recuperar senha</title>
+<style>
+:root{--bg:#262523;--stage:#3a3936;--card:#30302e;--floor:#2f2e2c;--ink:#f5f4ee;--muted:#a9a69e;--input:#242422;--line:#464441;--btn:#f5f4ee;--btn-ink:#1c1917;color-scheme:dark}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f3efe6;--stage:#ece7dc;--card:#fffdf9;--floor:#e0dacd;--ink:#1c1917;--muted:#6f6a5f;--input:#fff;--line:#ddd6c8;--btn:#1c1917;--btn-ink:#fffdf9;color-scheme:light}}
+:root[data-theme="light"]{--bg:#f3efe6;--stage:#ece7dc;--card:#fffdf9;--floor:#e0dacd;--ink:#1c1917;--muted:#6f6a5f;--input:#fff;--line:#ddd6c8;--btn:#1c1917;--btn-ink:#fffdf9;color-scheme:light}
+*{box-sizing:border-box}
+html,body{min-height:100%;margin:0}
+body{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--bg);font-family:"Plus Jakarta Sans",ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink)}
+.card{width:min(440px,100%);background:var(--card);border-radius:28px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.28);animation:in .7s cubic-bezier(.2,.8,.2,1) both}
+.stage{background:var(--stage)}
+.stage svg{display:block;width:100%;height:auto}
+.body{padding:6px 28px 30px}
+.brand{display:inline-flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.01em}
+.brand img{background:#f5f4ee;padding:4px;border-radius:10px;object-fit:contain;flex:none}
+.brand i{width:34px;height:34px;border-radius:10px;background:#ff8a4c;display:grid;place-items:center}
+h1{margin:16px 0 8px;font-size:28px;line-height:1.1;font-weight:800;letter-spacing:-.035em;outline:0}
+.sub{margin:0 0 22px;font-size:15px;line-height:1.5;color:var(--muted)}
+.sub b{color:var(--ink);font-weight:700;word-break:break-all}
+label{display:block;margin:0 0 8px;font-size:14px;font-weight:600;color:var(--muted)}
+input{width:100%;height:54px;padding:0 18px;border-radius:16px;border:1.5px solid var(--line);background:var(--input);color:var(--ink);font:inherit;font-size:16px;outline:0;transition:border-color .2s,box-shadow .2s}
+input::placeholder{color:var(--muted);opacity:.7}
+input:focus{border-color:#ff8a4c;box-shadow:0 0 0 4px rgba(255,138,76,.18)}
+input[aria-invalid="true"]{border-color:#ff6b57}
+.err{min-height:20px;margin:8px 0 0;font-size:13px;font-weight:600;color:#ff7a66}
+.btn{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;margin-top:10px;border:0;border-radius:99px;background:var(--btn);color:var(--btn-ink);font:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:transform .15s,opacity .2s}
+.btn:hover{transform:translateY(-1px)}.btn:active{transform:none}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn .sp{display:none;width:16px;height:16px;border-radius:50%;border:2.5px solid currentColor;border-top-color:transparent;animation:spin .7s linear infinite}
+.btn.loading .sp{display:block}
+.back{display:block;margin:20px auto 0;text-align:center;font-size:14px;color:var(--muted)}
+.back a{color:var(--muted);text-underline-offset:3px}.back a:hover{color:var(--ink)}
+.note{margin:16px 0 0;font-size:13px;line-height:1.5;color:var(--muted);text-align:center}
+[hidden]{display:none!important}
+
+/* cena */
+.hop,.sh{transform-box:fill-box}
+.hop{transform-origin:50% 100%;animation:idle 4s ease-in-out infinite}
+.sh{transform-origin:50% 50%}
+.c2{animation-delay:-1.3s}.c3{animation-delay:-2.6s}
+.sent .hop{animation:hop 1.7s cubic-bezier(.3,.1,.3,1) infinite}
+.sent .c2{animation-delay:.15s}.sent .c3{animation-delay:.3s}
+.eye{transform-box:fill-box;transform-origin:50% 50%;animation:blink 4.2s infinite}
+.pp{animation:look 3.2s ease-in-out infinite}
+.q{font:800 24px system-ui,sans-serif;animation:float 2.4s ease-in-out infinite;transition:opacity .3s}
+.sent .q{opacity:0}
+.shackle{transform-origin:155px 106px;transition:transform .7s cubic-bezier(.3,1.5,.5,1)}
+.sent .shackle{transform:rotate(-28deg)}
+.env{opacity:0;transform:translateY(-34px);transition:opacity .4s .25s,transform .7s .25s cubic-bezier(.3,1.5,.5,1)}
+.sent .env{opacity:1;transform:none}
+.envb{animation:float 2.6s ease-in-out infinite}
+.m2{opacity:0}.sent .m2{opacity:1}.sent .m1{opacity:0}
+.d2{opacity:0}.sent .d2{opacity:1}.sent .d1{opacity:0}
+@keyframes in{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes idle{0%,100%{transform:rotate(0)}50%{transform:rotate(1.6deg) translateY(-1px)}}
+@keyframes hop{0%,60%,100%{transform:none}10%{transform:scale(1.07,.9)}28%{transform:translateY(-18px) scale(.96,1.06)}46%{transform:scale(1.07,.9)}54%{transform:scale(.98,1.03)}}
+@keyframes blink{0%,94%,100%{transform:none}97%{transform:scaleY(.1)}}
+@keyframes look{0%,20%{transform:none}35%,55%{transform:translate(1.6px,-1px)}70%,90%{transform:translate(-1.6px,-1px)}100%{transform:none}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* desktop */
+@media (min-width:900px){
+.card{width:min(1080px,94vw);display:grid;grid-template-columns:1.35fr 1fr;border-radius:36px}
+.stage{display:flex;background:linear-gradient(90deg,var(--stage) 78%,var(--card))}
+.stage svg{height:100%;-webkit-mask-image:linear-gradient(90deg,#000 80%,transparent);mask-image:linear-gradient(90deg,#000 80%,transparent)}
+.body{padding:52px 56px 44px 16px;align-self:center}
+h1{font-size:38px;margin:22px 0 10px}
+.sub{font-size:16px}
+}
+</style>
+</head>
+<body>
+<main class="card" id="card">
+  <div class="stage">
+    <svg viewBox="3 0 340 210" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <defs><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--floor)"/><stop offset=".2" style="stop-color:var(--floor)"/><stop offset="1" style="stop-color:var(--card)"/></linearGradient></defs>
+      <rect x="0" y="176" width="360" height="35" fill="url(#fg)"/>
+      <ellipse cx="72" cy="179" rx="26" ry="4" fill="#000" opacity=".2"/><ellipse cx="173" cy="179" rx="36" ry="4" fill="#000" opacity=".2"/><ellipse cx="278" cy="179" rx="29" ry="4" fill="#000" opacity=".2"/>
+      <!-- interrogações -->
+      <text class="q" x="126" y="86" fill="#fbbf24">?</text><text class="q" style="animation-delay:-.8s" x="212" y="78" fill="#ff8a4c">?</text><text class="q" style="animation-delay:-1.6s" x="166" y="58" fill="#fdba74">?</text>
+      <!-- envelope -->
+      <g class="env"><g class="envb"><g transform="translate(150 20)"><rect width="46" height="32" rx="5" fill="#f5f4ee" stroke="#d3cdbf" stroke-width="1.5"/><path d="M3 4L23 20L43 4" fill="none" stroke="#d3cdbf" stroke-width="1.8" stroke-linejoin="round"/><circle cx="23" cy="20" r="5.5" fill="#ff8a4c"/></g></g></g>
+      <!-- moeda -->
+      <g class="hop c1"><circle cx="72" cy="150" r="26" fill="#ff8a4c"/><circle cx="72" cy="150" r="20.5" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="2"/><text x="72" y="134" text-anchor="middle" font-size="10" font-weight="800" fill="#ffd2b5" font-family="system-ui,sans-serif">R$</text><g class="face" data-f="72,150,19,5.5,141,164,9"></g></g>
+      <!-- cadeado -->
+      <g class="hop c2"><path class="shackle" d="M155 106V90a18 18 0 0 1 36 0V106" fill="none" stroke="#8d887d" stroke-width="9" stroke-linecap="round"/><rect x="143" y="104" width="60" height="72" rx="12" fill="#ff8a4c"/><g class="face" data-f="173,127,24,6.5,116,138,12"></g><circle cx="173" cy="153" r="4.5" fill="#1c1917" opacity=".85"/><rect x="171.5" y="154" width="3" height="10" rx="1.5" fill="#1c1917" opacity=".85"/></g>
+      <!-- calculadora -->
+      <g transform="translate(64 0)"><g class="hop c3"><rect x="186" y="92" width="56" height="84" rx="10" fill="#fdba74"/><rect x="194" y="100" width="40" height="16" rx="4" fill="#3a2f27"/><text class="d1" x="231" y="113" text-anchor="end" font-size="10" font-weight="800" fill="#ffb86b" font-family="ui-monospace,Menlo,monospace">****</text><text class="d2" x="231" y="112.5" text-anchor="end" font-size="9" font-weight="800" fill="#ffb86b" font-family="system-ui,sans-serif">OK</text><g class="face" data-f="214,134,22,5.5,124,146,10"></g><rect x="196" y="156" width="10" height="8" rx="2.5" fill="#d99a5c"/><rect x="210" y="156" width="10" height="8" rx="2.5" fill="#d99a5c"/><rect x="224" y="156" width="10" height="8" rx="2.5" fill="#ff8a4c"/></g></g>
+    </svg>
+  </div>
+
+  <div class="body">
+    <div class="brand"><img src="/contabilis-simbolo-escuro.svg" width="40" height="40" alt="">Contabilis</div>
+
+    <section id="v1" aria-live="polite">
+      <h1 tabindex="-1">Esqueceu a senha?</h1>
+      <p class="sub">Sem problema. Informe o e-mail do seu escritório e enviaremos um link para criar uma nova senha.</p>
+      <form id="form" novalidate>
+        <label for="email">E-mail</label>
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="nome@escritorio.com.br" required>
+        <p class="err" id="err" role="alert"></p>
+        <button class="btn" id="send" type="submit"><span class="sp"></span><span id="sendTxt">Enviar link de recuperação</span></button>
+      </form>
+      <p class="back"><a href="/login">Voltar para o login</a></p>
+    </section>
+
+    <section id="v2" hidden aria-live="polite">
+      <h1 tabindex="-1">Confira seu e-mail</h1>
+      <p class="sub">Se existir uma conta para <b id="sentTo"></b>, o link de recuperação chega em alguns minutos. Olhe também a caixa de spam.</p>
+      <button class="btn" id="resend" type="button" disabled>Reenviar em 30s</button>
+      <button class="btn ghost" id="other" type="button">Usar outro e-mail</button>
+      <p class="back"><a href="/login">Voltar para o login</a></p>
+      <p class="note">O link vale por 1 hora e só pode ser usado uma vez.</p>
+    </section>
+  </div>
+</main>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var card=$('card'),v1=$('v1'),v2=$('v2'),form=$('form'),email=$('email'),err=$('err'),send=$('send'),sendTxt=$('sendTxt'),resend=$('resend'),RESEND=30,cd=null;
+
+  /* rostos: olhos, pálpebras, boca reta (m1) e sorriso (m2) */
+  document.querySelectorAll('.face').forEach(function(g){
+    var p=g.getAttribute('data-f').split(',').map(Number),cx=p[0],cy=p[1],gap=p[2],r=p[3],lid=p[4],my=p[5],mw=p[6],h='';
+    [cx-gap/2,cx+gap/2].forEach(function(x){
+      h+='<g class="eye"><circle cx="'+x+'" cy="'+cy+'" r="'+r+'" fill="#fff"/><circle class="pp" cx="'+x+'" cy="'+cy+'" r="'+(r*.45).toFixed(2)+'" fill="#1c1917"/></g>';
+      h+='<rect x="'+(x-r*.85)+'" y="'+lid+'" width="'+(r*1.7)+'" height="2.4" rx="1.2" fill="#1c1917"/>';
+    });
+    h+='<rect class="m1" x="'+(cx-mw/2)+'" y="'+my+'" width="'+mw+'" height="2.4" rx="1.2" fill="#1c1917"/>';
+    h+='<path class="m2" d="M'+(cx-mw/2)+' '+(my+.5)+'Q'+cx+' '+(my+8)+' '+(cx+mw/2)+' '+(my+.5)+'" fill="none" stroke="#1c1917" stroke-width="2.4" stroke-linecap="round"/>';
+    g.innerHTML=h;
+  });
+
+  /* >>> Troque por sua chamada real. Responda sempre "ok", exista a conta ou não (evita revelar quem tem cadastro). */
+  function requestReset(mail){return fetch('/api/auth/password-reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:mail})}).then(function(res){return res.json().then(function(data){if(!res.ok)throw new Error(data.error||'Não foi possível solicitar a redefinição.');return data})})}
+
+  function setBusy(b){send.disabled=b;send.classList.toggle('loading',b);sendTxt.textContent=b?'Enviando…':'Enviar link de recuperação'}
+  function startCountdown(){
+    clearInterval(cd);var s=RESEND;resend.disabled=true;resend.textContent='Reenviar em '+s+'s';
+    cd=setInterval(function(){s--;if(s<=0){clearInterval(cd);resend.disabled=false;resend.textContent='Reenviar link'}else resend.textContent='Reenviar em '+s+'s'},1000);
+  }
+  function show(which){
+    var on=which===2;v1.hidden=on;v2.hidden=!on;card.classList.toggle('sent',on);
+    (on?v2:v1).querySelector('h1').focus({preventScroll:true});
+  }
+  function fail(msg){err.textContent=msg;email.setAttribute('aria-invalid','true');email.focus()}
+
+  email.addEventListener('input',function(){err.textContent='';email.removeAttribute('aria-invalid')});
+  form.addEventListener('submit',function(e){
+    e.preventDefault();var mail=email.value.trim();
+    if(!mail)return fail('Digite o e-mail do seu escritório.');
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail))return fail('Esse e-mail não parece válido. Confira e tente de novo.');
+    setBusy(true);
+    requestReset(mail).then(function(result){
+      $('sentTo').textContent=mail;setBusy(false);show(2);startCountdown();
+    },function(error){setBusy(false);fail(error.message||'Não foi possível enviar agora. Tente novamente em instantes.')});
+  });
+  resend.addEventListener('click',function(){resend.disabled=true;resend.textContent='Enviando…';requestReset(email.value.trim()).then(startCountdown,function(error){resend.disabled=false;resend.textContent='Reenviar link';fail(error.message||'Não foi possível reenviar agora.')})});
+  $('other').addEventListener('click',function(){clearInterval(cd);show(1);email.select()});
+})();
+</script>
+</body>
+</html>

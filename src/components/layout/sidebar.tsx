@@ -35,16 +35,16 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
   }, [pathname, onCloseMobile]);
 
   const navigation = [
-    { name: "Visão geral", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Clientes", href: "/dashboard/clients", icon: Users },
-    { name: "Documentos", href: "/dashboard/documents", icon: FolderOpen },
-    { name: "Conciliação bancária", href: "/dashboard/reconciliation", icon: ArrowLeftRight },
-    { name: "Relatórios & Balanços", href: "/dashboard/balance-mapping", icon: FileSpreadsheet },
-    { name: "Certidões", href: "/dashboard/certificates", icon: ShieldCheck },
-    { name: "Simuladores tributários", href: "/dashboard/tax-simulators", icon: Calculator },
-    { name: "Sites", href: "/dashboard/website-builder", icon: Globe },
-    { name: "Tarefas", href: "/dashboard/tasks", icon: CalendarCheck2 },
-    { name: "Notificações", href: "/dashboard/notifications", icon: Bell },
+    { name: "Visão geral", href: "/painel", icon: LayoutDashboard },
+    { name: "Clientes", href: "/clientes", icon: Users },
+    { name: "Documentos", href: "/documentos", icon: FolderOpen },
+    { name: "Conciliação bancária", href: "/conciliacao", icon: ArrowLeftRight },
+    { name: "Relatórios & Balanços", href: "/relatorios", icon: FileSpreadsheet },
+    { name: "Certidões", href: "/certidoes", icon: ShieldCheck },
+    { name: "Simuladores tributários", href: "/simuladores", icon: Calculator },
+    { name: "Sites", href: "/meu-site", icon: Globe },
+    { name: "Tarefas", href: "/tarefas", icon: CalendarCheck2 },
+    { name: "Notificações", href: "/notificacoes", icon: Bell },
   ];
 
   return (
@@ -72,7 +72,7 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
       >
         {/* Top Logo / Mobile Close */}
         <div className={`w-full flex items-center mb-3 ${isMobileOpen ? "justify-between px-2" : "justify-center"}`}>
-          <Link href="/dashboard" onClick={onCloseMobile}>
+          <Link href="/painel" onClick={onCloseMobile}>
             <img className="w-[38px] h-[38px] rounded-xl shadow-sm" src="/contabilis-simbolo-escuro.svg" alt="Contabilis" />
           </Link>
           {isMobileOpen && (
@@ -88,7 +88,7 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
         {/* Navigation Items */}
         <nav className="flex flex-col gap-1 flex-1 w-full items-center">
           {navigation.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            const isActive = pathname === item.href || (item.href !== "/painel" && pathname.startsWith(item.href));
             const Icon = item.icon;
 
             return (
@@ -183,17 +183,17 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
 
           {/* Configurações */}
           <Link
-            href="/dashboard/settings"
+            href="/configuracoes"
             onClick={onCloseMobile}
             className={`group relative h-11 rounded-2xl flex items-center justify-center transition-colors cursor-pointer ${
-              pathname === "/dashboard/settings"
+              pathname === "/configuracoes"
                 ? "font-semibold shadow-sm"
                 : ""
             } ${isMobileOpen ? "w-full px-3 gap-3 justify-start" : "w-11"}`}
             style={{
-              color: pathname === "/dashboard/settings" ? "var(--or)" : "var(--tx2)",
-              backgroundColor: pathname === "/dashboard/settings" ? "var(--surf)" : "transparent",
-              boxShadow: pathname === "/dashboard/settings" ? "4px 4px 10px var(--neo-d), -4px -4px 10px var(--neo-l)" : "none",
+              color: pathname === "/configuracoes" ? "var(--or)" : "var(--tx2)",
+              backgroundColor: pathname === "/configuracoes" ? "var(--surf)" : "transparent",
+              boxShadow: pathname === "/configuracoes" ? "4px 4px 10px var(--neo-d), -4px -4px 10px var(--neo-l)" : "none",
             }}
             aria-label="Configurações"
           >

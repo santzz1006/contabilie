@@ -28,21 +28,21 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const router = useRouter();
 
   const items = [
-    { title: "Visão Geral", type: "Módulo", href: "/dashboard", icon: LayoutDashboard },
-    { title: "Clientes e Carteira", type: "Módulo", href: "/dashboard/clients", icon: Users },
-    { title: "Documentos e Coleta", type: "Módulo", href: "/dashboard/documents", icon: FolderOpen },
-    { title: "Conciliação Bancária", type: "Módulo", href: "/dashboard/reconciliation", icon: ArrowLeftRight },
-    { title: "Relatórios e Balanços", type: "Módulo", href: "/dashboard/balance-mapping", icon: FileSpreadsheet },
-    { title: "Certidões (CNDs)", type: "Módulo", href: "/dashboard/certificates", icon: ShieldCheck },
-    { title: "Simuladores Tributários", type: "Módulo", href: "/dashboard/tax-simulators", icon: Calculator },
-    { title: "Sites Contábeis", type: "Módulo", href: "/dashboard/website-builder", icon: Globe },
-    { title: "Tarefas e Obrigações", type: "Módulo", href: "/dashboard/tasks", icon: CalendarCheck2 },
-    { title: "WhatsApp e Notificações", type: "Módulo", href: "/dashboard/notifications", icon: FolderOpen },
-    { title: "Configurações e Auditoria", type: "Módulo", href: "/dashboard/settings", icon: Settings },
+    { title: "Visão Geral", type: "Módulo", href: "/painel", icon: LayoutDashboard },
+    { title: "Clientes e Carteira", type: "Módulo", href: "/clientes", icon: Users },
+    { title: "Documentos e Coleta", type: "Módulo", href: "/documentos", icon: FolderOpen },
+    { title: "Conciliação Bancária", type: "Módulo", href: "/conciliacao", icon: ArrowLeftRight },
+    { title: "Relatórios e Balanços", type: "Módulo", href: "/relatorios", icon: FileSpreadsheet },
+    { title: "Certidões (CNDs)", type: "Módulo", href: "/certidoes", icon: ShieldCheck },
+    { title: "Simuladores Tributários", type: "Módulo", href: "/simuladores", icon: Calculator },
+    { title: "Sites Contábeis", type: "Módulo", href: "/meu-site", icon: Globe },
+    { title: "Tarefas e Obrigações", type: "Módulo", href: "/tarefas", icon: CalendarCheck2 },
+    { title: "WhatsApp e Notificações", type: "Módulo", href: "/notificacoes", icon: FolderOpen },
+    { title: "Configurações e Auditoria", type: "Módulo", href: "/configuracoes", icon: Settings },
     // Clientes da base
-    { title: "TechSolutions Software", type: "Cliente", href: "/dashboard/clients", icon: Building },
-    { title: "Supermercado Bom Sabor", type: "Cliente", href: "/dashboard/clients", icon: Building },
-    { title: "Clínica Nova Vida", type: "Cliente", href: "/dashboard/clients", icon: Building },
+    { title: "TechSolutions Software", type: "Cliente", href: "/clientes", icon: Building },
+    { title: "Supermercado Bom Sabor", type: "Cliente", href: "/clientes", icon: Building },
+    { title: "Clínica Nova Vida", type: "Cliente", href: "/clientes", icon: Building },
   ];
 
   const filtered = items.filter(i =>

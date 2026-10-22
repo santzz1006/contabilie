@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { ThemeProvider } from "@/lib/theme";
@@ -14,7 +15,36 @@ export default function DashboardLayout({
 }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isCommandOpen, setIsCommandOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("visao_geral");
+  useEffect(() => {
+    const syncTab = () => {
+      if (window.location.hash === "#activities") setActiveTab("atividades");
+      else if (pathname === "/tarefas") setActiveTab("pendencias");
+      else if (pathname === "/documentos") setActiveTab("processamento");
+      else if (pathname === "/relatorios") setActiveTab("relatorios");
+      else setActiveTab("visao_geral");
+    };
+    syncTab();
+    window.addEventListener("hashchange", syncTab);
+    window.addEventListener("popstate", syncTab);
+    return () => {
+      window.removeEventListener("hashchange", syncTab);
+      window.removeEventListener("popstate", syncTab);
+    };
+  }, [pathname]);
+  const selectTab = (tab: string) => {
+    setActiveTab(tab);
+    const destinations: Record<string, string> = {
+      visao_geral: "/painel",
+      atividades: "/painel#activities",
+      pendencias: "/tarefas?status=pendente",
+      processamento: "/documentos",
+      relatorios: "/relatorios",
+    };
+    router.push(destinations[tab] || "/painel");
+  };
   const closeMobileMenu = useCallback(() => setIsMobileOpen(false), []);
 
   return (
@@ -41,10 +71,10 @@ export default function DashboardLayout({
             onOpenMobileMenu={() => setIsMobileOpen(true)}
             onOpenCommandPalette={() => setIsCommandOpen(true)}
             activeTab={activeTab}
-            onSelectTab={setActiveTab}
+            onSelectTab={selectTab}
           />
 
-          <main className="dashboard-page-content flex-1 p-6 md:p-8 max-w-[1360px] w-full mx-auto">
+          <main className="contabilis-app-content dashboard-page-content flex-1 p-6 md:p-8 max-w-[1360px] w-full mx-auto">
             {children}
           </main>
         </div>

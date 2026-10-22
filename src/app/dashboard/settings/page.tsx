@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Settings,
   Shield,
@@ -17,28 +18,49 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Organization, User, AuditEvent } from "@/lib/types";
+import { Organization, User, AuditEvent, Client, UserRole } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
 export default function SettingsPage() {
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditEvent[]>([]);
+  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "assistant" as UserRole, clientId: "" });
+  const [userFeedback, setUserFeedback] = useState("");
+  const [savingUser, setSavingUser] = useState(false);
   const [activeTab, setActiveTab] = useState<"organization" | "users" | "audit" | "lgpd">("organization");
 
   const loadData = async () => {
     try {
-      const [resOrg, resUsers, resAudit] = await Promise.all([
+      const [resOrg, resUsers, resAudit, resClients] = await Promise.all([
         fetch("/api/settings/organization"),
         fetch("/api/settings/users"),
-        fetch("/api/settings/audit")
+        fetch("/api/settings/audit"),
+        fetch("/api/clients")
       ]);
       if (resOrg.ok) setOrganization(await resOrg.json());
       if (resUsers.ok) setUsers(await resUsers.json());
       if (resAudit.ok) setAuditLogs(await resAudit.json());
+      if (resClients.ok) setClients(await resClients.json());
     } catch (e) {
       console.error(e);
     }
+  };
+
+  const createUser = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSavingUser(true);
+    setUserFeedback("");
+    try {
+      const response = await fetch("/api/settings/users", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newUser) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Não foi possível criar o acesso.");
+      setNewUser({ name: "", email: "", password: "", role: "assistant", clientId: "" });
+      setUserFeedback("Acesso criado. Entregue a senha ao usuário por um canal seguro.");
+      await loadData();
+    } catch (error) { setUserFeedback(error instanceof Error ? error.message : "Falha ao criar acesso."); }
+    finally { setSavingUser(false); }
   };
 
   useEffect(() => {
@@ -109,6 +131,12 @@ export default function SettingsPage() {
               <CardDescription>Identificação cadastral da empresa contábil</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-xs">
+              <div className="rounded-xl border p-4" style={{ borderColor: "var(--line)", background: "var(--surf2)" }}>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div><strong className="block text-sm" style={{ color: "var(--tx)" }}>Meu site</strong><span style={{ color: "var(--tx2)" }}>Construa e publique a página institucional do escritório como benefício do Contabilis.</span></div>
+                  <Link href="/dashboard/website-builder" className="inline-flex items-center justify-center rounded-lg px-3 py-2 text-xs font-semibold" style={{ background: "var(--dk)", color: "var(--dk-tx)" }}>Abrir criador de sites</Link>
+                </div>
+              </div>
               <div>
                 <span className="text-slate-400 block">Razão Social:</span>
                 <span className="font-semibold text-slate-800 text-sm">{organization.name}</span>
@@ -175,6 +203,18 @@ export default function SettingsPage() {
             <CardDescription>Perfis: Administrador, Contador/Gestor, Analista Contábil e Assistente</CardDescription>
           </CardHeader>
           <CardContent>
+            <form onSubmit={createUser} className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3 rounded-xl border p-4" style={{ borderColor: "var(--line)", background: "var(--surf2)" }}>
+              <div className="md:col-span-2"><strong className="text-sm">Criar acesso para funcionário ou cliente</strong><p className="text-xs text-slate-500 mt-1">O cliente poderá entrar no portal e verá apenas os próprios documentos.</p></div>
+              <input required minLength={2} placeholder="Nome completo" value={newUser.name} onChange={(e) => setNewUser({ ...newUser, name: e.target.value })} className="rounded-lg border px-3 py-2 text-xs" />
+              <input required type="email" placeholder="E-mail de acesso" value={newUser.email} onChange={(e) => setNewUser({ ...newUser, email: e.target.value })} className="rounded-lg border px-3 py-2 text-xs" />
+              <input required minLength={10} type="password" autoComplete="new-password" placeholder="Senha temporária (mínimo 10 caracteres)" value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} className="rounded-lg border px-3 py-2 text-xs" />
+              <select value={newUser.role} onChange={(e) => setNewUser({ ...newUser, role: e.target.value as UserRole })} className="rounded-lg border px-3 py-2 text-xs">
+                <option value="manager">Contador / gestor</option><option value="analyst">Analista</option><option value="assistant">Assistente</option><option value="client">Cliente (portal)</option>
+              </select>
+              {newUser.role === "client" && <select required value={newUser.clientId} onChange={(e) => setNewUser({ ...newUser, clientId: e.target.value })} className="rounded-lg border px-3 py-2 text-xs"><option value="">Selecione o cliente</option>{clients.map((client) => <option key={client.id} value={client.id}>{client.tradeName}</option>)}</select>}
+              <Button type="submit" disabled={savingUser || (newUser.role === "client" && clients.length === 0)}>{savingUser ? "Criando acesso..." : "Criar acesso"}</Button>
+              {userFeedback && <p role="status" className="md:col-span-2 text-xs">{userFeedback}</p>}
+            </form>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-slate-50 border-y border-slate-200 text-slate-500 font-semibold uppercase tracking-wider">

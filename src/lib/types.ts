@@ -56,6 +56,7 @@ export interface User {
   clientId?: string;
   active: boolean;
   avatarUrl?: string;
+  passwordHash?: string;
 }
 
 export interface Client {
@@ -258,6 +259,15 @@ export interface NotificationItem {
   recipient: string;
   title: string;
   message: string;
-  status: 'enviado' | 'pendente' | 'falha';
+  status: 'enviado' | 'pendente' | 'preparada' | 'falha';
+  createdAt: string;
+}
+
+export interface PasswordResetRecord {
+  tokenHash: string;
+  userId: string;
+  tenantId: string;
+  expiresAt: string;
+  usedAt?: string;
   createdAt: string;
 }

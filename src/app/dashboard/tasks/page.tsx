@@ -14,20 +14,25 @@ import {
   Check,
   X,
   UserCheck,
-  Tag
+  Tag,
+  ExternalLink
 } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/feedback/empty-state";
-import { TaskItem, Client, TaskPriority, TaskStatus } from "@/lib/types";
+import { TaskItem, Client, User, TaskPriority, TaskStatus } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [selectedClientId, setSelectedClientId] = useState<string>("all");
+  const [selectedUserId, setSelectedUserId] = useState<string>("all");
+  const [detailsTask, setDetailsTask] = useState<TaskItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Form State
@@ -37,6 +42,7 @@ export default function TasksPage() {
     description: "",
     category: "fiscal" as TaskItem['category'],
     dueDate: "2026-11-20",
+    assignedToUserId: "usr-analista-1",
     priority: "alta" as TaskPriority,
     isRecurring: true,
   });
@@ -45,10 +51,12 @@ export default function TasksPage() {
     try {
       const [resClients, resTasks] = await Promise.all([
         fetch("/api/clients"),
-        fetch("/api/tasks")
+        fetch("/api/tasks"),
       ]);
       if (resClients.ok) setClients(await resClients.json());
       if (resTasks.ok) setTasks(await resTasks.json());
+      const resUsers = await fetch("/api/settings/users");
+      if (resUsers.ok) setUsers((await resUsers.json()).filter((u: User) => u.active && u.role !== "client"));
     } catch (e) {
       console.error(e);
     }
@@ -56,6 +64,8 @@ export default function TasksPage() {
 
   useEffect(() => {
     loadData();
+    const statusFromUrl = new URLSearchParams(window.location.search).get("status");
+    if (statusFromUrl === "pendente" || statusFromUrl === "em_andamento" || statusFromUrl === "concluida") setSelectedStatus(statusFromUrl);
   }, []);
 
   const handleCreateTask = async (e: React.FormEvent) => {
@@ -81,6 +91,7 @@ export default function TasksPage() {
           description: "",
           category: "fiscal",
           dueDate: "2026-11-20",
+          assignedToUserId: users[0]?.id || "usr-analista-1",
           priority: "alta",
           isRecurring: true,
         });
@@ -109,7 +120,8 @@ export default function TasksPage() {
   const filteredTasks = tasks.filter(t => {
     const matchStatus = selectedStatus === "all" || t.status === selectedStatus;
     const matchClient = selectedClientId === "all" || t.clientId === selectedClientId;
-    return matchStatus && matchClient;
+    const matchUser = selectedUserId === "all" || t.assignedToUserId === selectedUserId;
+    return matchStatus && matchClient && matchUser;
   });
 
   return (
@@ -157,6 +169,13 @@ export default function TasksPage() {
             </div>
 
             <div className="w-full md:w-auto">
+              <select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)} aria-label="Filtrar por contador responsável" className="w-full border border-slate-300 rounded-lg text-xs p-2 bg-white text-slate-700">
+                <option value="all">Tarefas de todos os contadores</option>
+                {users.map(user => <option key={user.id} value={user.id}>{user.name}</option>)}
+              </select>
+            </div>
+
+            <div className="w-full md:w-auto">
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
@@ -185,7 +204,10 @@ export default function TasksPage() {
         <div className="space-y-3">
           {filteredTasks.map((task) => {
             const client = clients.find(c => c.id === task.clientId);
+            const owner = users.find(user => user.id === task.assignedToUserId);
             const isCompleted = task.status === "concluida";
+            const isPending = task.status === "pendente";
+            const isCertificate = /cnd|certid[aã]o/i.test(task.title);
 
             return (
               <Card
@@ -244,24 +266,39 @@ export default function TasksPage() {
                           <Calendar className="h-3.5 w-3.5 text-slate-400" />
                           Vencimento: {formatDate(task.dueDate)}
                         </span>
+                        <span className="flex items-center gap-1"><UserCheck className="h-3.5 w-3.5" />{owner?.name || "Sem responsável"}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="shrink-0">
-                    <Button
-                      size="sm"
-                      variant={isCompleted ? "ghost" : "outline"}
-                      onClick={() => handleToggleTaskStatus(task)}
-                      className="text-xs"
-                    >
-                      {isCompleted ? "Reabrir" : "Concluir"}
-                    </Button>
+                    {isCompleted ? (
+                      <Button size="sm" variant="outline" onClick={() => setDetailsTask(task)} className="text-xs">Detalhes</Button>
+                    ) : task.status === "em_andamento" ? (
+                      <Button size="sm" variant="outline" onClick={() => setDetailsTask(task)} className="text-xs">Conferir</Button>
+                    ) : (
+                      <div className="flex gap-2">
+                        {isCertificate && <Link href="/dashboard/certificates" className="inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs"><ExternalLink className="h-3 w-3"/>Emitir CND</Link>}
+                        <Button size="sm" variant="outline" disabled={!client?.phone} title={!client?.phone ? "Cadastre o WhatsApp do cliente" : "Abrir conversa no WhatsApp"} onClick={() => client?.phone && window.open(`https://wa.me/${client.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá, ${client.tradeName}! Lembrete: ${task.title}, com vencimento em ${formatDate(task.dueDate)}.`)}`, "_blank", "noopener,noreferrer")} className="text-xs">Lembrar cliente</Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Card>
             );
           })}
+        </div>
+      )}
+
+      {/* Modal Nova Tarefa */}
+      {detailsTask && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setDetailsTask(null)}>
+          <section role="dialog" aria-modal="true" aria-labelledby="task-detail-title" className="w-full max-w-lg rounded-2xl border p-6 shadow-xl" style={{ background: "var(--surf)", borderColor: "var(--line)", color: "var(--tx)" }} onClick={(event) => event.stopPropagation()}>
+            <div className="flex justify-between items-start gap-4"><div><h2 id="task-detail-title" className="font-semibold">{detailsTask.title}</h2><p className="mt-1 text-xs" style={{ color: "var(--tx2)" }}>Resumo da tarefa concluída</p></div><button onClick={() => setDetailsTask(null)} aria-label="Fechar">×</button></div>
+            <dl className="mt-5 grid grid-cols-2 gap-4 text-sm"><div><dt className="text-xs" style={{ color: "var(--tx2)" }}>Status</dt><dd>{detailsTask.status}</dd></div><div><dt className="text-xs" style={{ color: "var(--tx2)" }}>Vencimento</dt><dd>{formatDate(detailsTask.dueDate)}</dd></div><div><dt className="text-xs" style={{ color: "var(--tx2)" }}>Responsável</dt><dd>{users.find(user => user.id === detailsTask.assignedToUserId)?.name || "Sem responsável"}</dd></div><div><dt className="text-xs" style={{ color: "var(--tx2)" }}>Cliente</dt><dd>{clients.find(client => client.id === detailsTask.clientId)?.tradeName || "Rotina do escritório"}</dd></div></dl>
+            {detailsTask.description && <p className="mt-4 text-sm">{detailsTask.description}</p>}
+            <div className="mt-5 flex justify-end gap-2">{detailsTask.status === "concluida" && <Button variant="outline" onClick={() => { handleToggleTaskStatus(detailsTask); setDetailsTask(null); }}>Reabrir tarefa</Button>}<Button onClick={() => setDetailsTask(null)}>Fechar</Button></div>
+          </section>
         </div>
       )}
 
@@ -295,6 +332,13 @@ export default function TasksPage() {
                   {clients.map(c => (
                     <option key={c.id} value={c.id}>{c.tradeName} ({c.name})</option>
                   ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Contador responsável</label>
+                <select required value={taskForm.assignedToUserId} onChange={(e) => setTaskForm({ ...taskForm, assignedToUserId: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs">
+                  {users.map(user => <option key={user.id} value={user.id}>{user.name}</option>)}
                 </select>
               </div>
 

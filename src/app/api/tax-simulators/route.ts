@@ -4,7 +4,7 @@ import { TaxSimulation } from '@/lib/types';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const tenantId = searchParams.get('tenantId') || 'org-contabil-alpha';
+  const tenantId = request.headers.get('x-contabilis-tenant') || '';
 
   const sims = db.getTaxSimulations(tenantId);
   return NextResponse.json(sims);
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const tenantId = body.tenantId || 'org-contabil-alpha';
+    const tenantId = request.headers.get('x-contabilis-tenant') || '';
 
     const newSim: TaxSimulation = {
       id: `sim-${Date.now()}`,
